@@ -14,23 +14,23 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 try {
     // Preparar e executar a consulta SQL
-    $select = "SELECT * FROM exemplo";
+    $select = "SELECT * FROM comentarios_paginas";
     $stmt = $connection->prepare($select);
     $stmt->execute();
 
     // Verificar se há registros
     if ($stmt->rowCount() > 0) {
-        $vetor_exemplos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $vetor_comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode([
             'success' => 1,
-            'vetor_exemplos' => $vetor_exemplos,
+            'vetor_comentarios' => $vetor_comentarios,
         ]);
     } else {
         echo json_encode([
             'success' => 0,
             'message' => 'Nenhum registro encontrado.',
-            'vetor_exemplos' => [],
+            'vetor_comentarios' => [],
         ]);
     }
 } catch (PDOException $e) {

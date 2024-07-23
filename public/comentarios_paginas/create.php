@@ -22,25 +22,49 @@ if ($method !== 'POST') {
 $data = json_decode(file_get_contents("php://input"));
 
 try {
-    // Sanitizar os dados recebidos
-    $dado_de_exemplo1 = htmlspecialchars(trim($data->dado1));
-    $dado_de_exemplo2 = htmlspecialchars(trim($data->dado2));
+    include 'currentTime_function.php';
+
+    $criado_em = getCurrentTime();
+
+    // Organizar e filtrar os dados recebidos
+    $pagina_id = htmlspecialchars(trim($data->pagina_id));
+    $user_name = htmlspecialchars(trim($data->user_name));
+    $profissao = htmlspecialchars(trim($data->profissao));
+    $email = htmlspecialchars(trim($data->email));
+    $conteudo = htmlspecialchars(trim($data->conteudo));
+    $avaliacao = htmlspecialchars(trim($data->avaliacao));
 
     // Preparar a consulta SQL para inserção
-    $query = "INSERT INTO `cliente` (
-            dado_de_exemplo1,
-            dado_de_exemplo2
+    $query = "INSERT INTO `comentarios_paginas` (
+            pagina_id,
+            user_name,
+            profissao,
+            email,
+            conteudo,
+            avaliacao,
+            criado_em
             ) 
             VALUES (
-            :dado_de_exemplo1,
-            :dado_de_exemplo2
+            :pagina_id,
+            :user_name,
+            :profissao,
+            :email,
+            :conteudo,
+            :avaliacao,
+            :criado_em
             )";
 
     $stmt = $connection->prepare($query);
 
     // Associar os valores aos parâmetros da consulta
-    $stmt->bindValue(':dado_de_exemplo1', $dado_de_exemplo1, PDO::PARAM_STR);
-    $stmt->bindValue(':dado_de_exemplo2', $dado_de_exemplo2, PDO::PARAM_STR);
+    $stmt->bindValue(':pagina', $pagina, PDO::PARAM_STR);
+    $stmt->bindValue(':postagem_id', $postagem_id, PDO::PARAM_STR);
+    $stmt->bindValue(':user_name', $user_name, PDO::PARAM_STR);
+    $stmt->bindValue(':profissao', $profissao, PDO::PARAM_STR);
+    $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+    $stmt->bindValue(':conteudo', $conteudo, PDO::PARAM_STR);
+    $stmt->bindValue(':avaliacao', $avaliacao, PDO::PARAM_STR);
+    $stmt->bindValue(':criado_em', $criado_em, PDO::PARAM_STR);
 
     // Executar a consulta e verificar se a inserção foi bem-sucedida
     if ($stmt->execute()) {
