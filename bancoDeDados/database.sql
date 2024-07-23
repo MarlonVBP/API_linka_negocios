@@ -26,21 +26,37 @@ CREATE TABLE IF NOT EXISTS postagens (
     url_imagem VARCHAR(255),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES admin(id) ON DELETE CASCADE,
     FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE SET NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS comentarios (
+CREATE TABLE IF NOT EXISTS paginas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    pagina VARCHAR(20) NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS comentarios_postagens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
     postagem_id INT NOT NULL,
     user_name VARCHAR(50) NOT NULL,
-    profissao VARCHAR(50) NOT NULL,
+    profissao VARCHAR(50),
     email VARCHAR(255) NOT NULL,
     conteudo TEXT NOT NULL,
-    avaliacao INT NOT NULL CHECK (avaliacao >= 1 AND avaliacao <= 5),
+    avaliacao INT CHECK (avaliacao >= 1 AND avaliacao <= 5),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS comentarios_paginas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    pagina_id INT NOT NULL,
+    user_name VARCHAR(50) NOT NULL,
+    profissao VARCHAR(50),
+    email VARCHAR(255) NOT NULL,
+    conteudo TEXT NOT NULL,
+    avaliacao INT CHECK (avaliacao >= 1 AND avaliacao <= 5),
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (pagina_id) REFERENCES paginas(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS tags (
