@@ -3,12 +3,12 @@ include '../../cors.php';
 include '../../conn.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['title']) && isset($_POST['content']) && isset($_FILES['image'])) {
+    if (isset($_POST['title']) && isset($_POST['content']) && isset($_FILES['image']) && isset($_POST['category_id'])) {
         $title = trim($_POST['title']);
         $content = trim($_POST['content']);
+        $category_id = intval($_POST['category_id']);  
 
-        $usuario_id = 1; 
-        $categoria_id = 1; 
+        $usuario_id = 1;  
 
         if ($_FILES['image']['error'] == UPLOAD_ERR_OK) {
             $image = $_FILES['image']['name'];
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $stmt = $connection->prepare($query);
 
                 $stmt->bindValue(':usuario_id', $usuario_id, PDO::PARAM_INT);
-                $stmt->bindValue(':categoria_id', $categoria_id, PDO::PARAM_INT);
+                $stmt->bindValue(':categoria_id', $category_id, PDO::PARAM_INT);  
                 $stmt->bindValue(':titulo', $title, PDO::PARAM_STR);
                 $stmt->bindValue(':conteudo', $content, PDO::PARAM_STR);
                 $stmt->bindValue(':url_imagem', $target_file, PDO::PARAM_STR);
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         'success' => true,
                         'message' => 'Postagem criada com sucesso',
                         'data' => [
-                            'id' => $connection->lastInsertId(), 
+                            'id' => $connection->lastInsertId(),
                             'title' => $title,
                             'content' => $content,
                             'image' => $target_file
@@ -68,3 +68,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 header('Content-Type: application/json');
 echo json_encode($response);
+?>
