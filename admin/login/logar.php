@@ -1,6 +1,6 @@
 <?php
-include '../cors.php';
-include '../conn.php';
+include '../../cors.php';
+include '../../conn.php';
 include 'criarJwt.php';
 
 // Obter os dados JSON do corpo da solicitação
@@ -8,10 +8,10 @@ $data = json_decode(file_get_contents("php://input"));
 
 try {
     // Preparar a consulta SQL para verificar as credenciais do administrador
-    $sql = "SELECT `id_admin` FROM `admin` WHERE email_admin=:email AND senha_admin=:senha";
+    $sql = "SELECT * FROM `admin` WHERE email=:email AND senha=:senha";
     $stmt = $connection->prepare($sql);
     $stmt->bindValue(':email', $data->email, PDO::PARAM_STR);
-    $stmt->bindValue(':senha', $data->password, PDO::PARAM_STR);
+    $stmt->bindValue(':senha', $data->senha, PDO::PARAM_STR);
     $stmt->execute();
 
     // Verificar se a consulta retornou algum resultado
@@ -20,12 +20,17 @@ try {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Criar o token JWT
-        $token = criar_jwt($user['id_admin'], $data->email, $data->password);
+        $token = criar_jwt($user['id'], $data->email, $data->senha);
 
+        $data = [
+            'token' => $token,
+            'nome' => $user['nome_admin']
+        ];
+        
         // Enviar a resposta com o token JWT
         echo json_encode([
             'success' => 1,
-            'token' => $token
+            'response' => $data
         ]);
         exit;
     }

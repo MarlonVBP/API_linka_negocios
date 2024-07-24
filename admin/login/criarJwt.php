@@ -1,5 +1,5 @@
 <?php
-require '../login/base64url_encode.php';
+require 'base64url_encode.php';
 
 function criar_jwt($ID_USER, $TIPO_USER, $LOGIN_USER) {
     $secret = '#Frngoclimao20';

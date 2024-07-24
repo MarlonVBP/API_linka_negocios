@@ -1,5 +1,5 @@
 <?php
-require '../login/base64url_encode.php';
+require 'base64url_encode.php';
 
 function jwt_eh_valido($token) {
     $parts = explode('.', $token);

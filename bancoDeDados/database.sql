@@ -89,3 +89,5 @@ CREATE TABLE IF NOT EXISTS faq (
     resposta TEXT,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
