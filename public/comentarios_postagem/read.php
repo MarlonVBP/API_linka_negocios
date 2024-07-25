@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 try {
     // Preparar e executar a consulta SQL
-    $select = "SELECT * FROM comentarios_paginas";
+    $select = "SELECT * FROM comentarios_postagens";
     $stmt = $connection->prepare($select);
     $stmt->execute();
 
