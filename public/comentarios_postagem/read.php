@@ -13,18 +13,46 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
+    // Obter o ID da postagem dos parâmetros da URL
+    $id = $_GET['id'] ?? null;
+    
+    // Verificar se o ID foi fornecido
+    if (!$id) {
+        echo json_encode([
+            'success' => 0,
+            'message' => 'ID da postagem não fornecido.',
+        ]);
+        exit;
+    }
+    
     // Preparar e executar a consulta SQL
-    $select = "SELECT * FROM comentarios_postagens";
+    $select = "SELECT * FROM comentarios_postagens WHERE postagem_id = :id";
     $stmt = $connection->prepare($select);
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
 
     // Verificar se há registros
     if ($stmt->rowCount() > 0) {
-        $vetor_comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Formatar a data e a avaliação de cada comentário
+        foreach ($comentarios as &$comentario) {
+            // Formatar a data
+            $date = new DateTime($comentario['criado_em']);
+            $comentario['criado_em'] = $date->format('M d, Y');
+
+            // Converter a avaliação em estrelas
+            $avaliacao = intval($comentario['avaliacao']); // Certifique-se de que 'avaliacao' é um número inteiro
+            $rating_stars = '';
+            for ($i = 1; $i <= 5; $i++) {
+                $rating_stars .= $avaliacao >= $i ? '★' : '☆'; // Use '★' para estrela cheia e '☆' para estrela vazia
+            }
+            $comentario['avaliacao'] = $rating_stars;
+        }
 
         echo json_encode([
             'success' => 1,
-            'response' => $vetor_comentarios,
+            'response' => $comentarios,
         ]);
     } else {
         echo json_encode([

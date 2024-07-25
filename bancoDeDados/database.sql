@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS paginas (
 
 CREATE TABLE IF NOT EXISTS comentarios_postagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    pagina_id INT NOT NULL,
+    postagem_id INT NOT NULL,
     user_name VARCHAR(50) NOT NULL,
     profissao VARCHAR(50),
     email VARCHAR(255) NOT NULL,

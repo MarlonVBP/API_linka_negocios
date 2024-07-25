@@ -4,8 +4,24 @@ include '../../conn.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     try {
-        $query = "SELECT p.id, p.titulo, p.conteudo, p.url_imagem, p.criado_em, u.nome_admin as usuario_nome, c.nome as categoria_nome FROM postagens p JOIN admin u ON p.usuario_id = u.id JOIN categorias c ON p.categoria_id = c.id";
-        $stmt = $connection->prepare($query);
+        $id = $_GET['id'] ?? null;
+
+        if ($id) {
+            $query = "SELECT p.id, p.titulo, p.conteudo, p.url_imagem, p.criado_em, u.nome_admin as usuario_nome, c.nome as categoria_nome 
+                      FROM postagens p 
+                      JOIN admin u ON p.usuario_id = u.id 
+                      JOIN categorias c ON p.categoria_id = c.id 
+                      WHERE p.id = :id";
+            $stmt = $connection->prepare($query);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        } else {
+            $query = "SELECT p.id, p.titulo, p.conteudo, p.url_imagem, p.criado_em, u.nome_admin as usuario_nome, c.nome as categoria_nome 
+                      FROM postagens p 
+                      JOIN admin u ON p.usuario_id = u.id 
+                      JOIN categorias c ON p.categoria_id = c.id";
+            $stmt = $connection->prepare($query);
+        }
+
         $stmt->execute();
 
         $postagens = $stmt->fetchAll(PDO::FETCH_ASSOC);
