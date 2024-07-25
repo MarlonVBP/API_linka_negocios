@@ -37,14 +37,14 @@ CREATE TABLE IF NOT EXISTS paginas (
 
 CREATE TABLE IF NOT EXISTS comentarios_postagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    postagem_id INT NOT NULL,
+    pagina_id INT NOT NULL,
     user_name VARCHAR(50) NOT NULL,
     profissao VARCHAR(50),
     email VARCHAR(255) NOT NULL,
     conteudo TEXT NOT NULL,
     avaliacao INT CHECK (avaliacao >= 1 AND avaliacao <= 5),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE
+    FOREIGN KEY (pagina_id) REFERENCES pagina(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS comentarios_paginas (

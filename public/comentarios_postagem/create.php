@@ -25,7 +25,7 @@ try {
 
 
     // Organizar e filtrar os dados recebidos
-    $pagina_id = htmlspecialchars(trim($data->id));
+    $postagem_id = htmlspecialchars(trim($data->id));
     $user_name = htmlspecialchars(trim($data->nome));
     $profissao = htmlspecialchars(trim($data->profissao));
     $email = htmlspecialchars(trim($data->email));
@@ -33,8 +33,8 @@ try {
     $avaliacao = htmlspecialchars(trim($data->avaliacao));
 
     // Preparar a consulta SQL para inserção
-    $query = "INSERT INTO `comentarios_paginas` (
-            pagina_id,
+    $query = "INSERT INTO `comentarios_postagens` (
+            postagem_id,
             user_name,
             profissao,
             email,
@@ -42,7 +42,7 @@ try {
             avaliacao
             ) 
             VALUES (
-            :pagina_id,
+            :postagem_id,
             :user_name,
             :profissao,
             :email,
@@ -53,7 +53,7 @@ try {
     $stmt = $connection->prepare($query);
 
     // Associar os valores aos parâmetros da consulta
-    $stmt->bindValue(':pagina_id', $pagina_id, PDO::PARAM_STR);
+    $stmt->bindValue(':postagem_id', $postagem_id, PDO::PARAM_STR);
     $stmt->bindValue(':user_name', $user_name, PDO::PARAM_STR);
     $stmt->bindValue(':profissao', $profissao, PDO::PARAM_STR);
     $stmt->bindValue(':email', $email, PDO::PARAM_STR);
