@@ -2,44 +2,31 @@
 include '../../cors.php';
 include '../../conn.php';
 
-// Verificar se o método de requisição é GET
-if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-    http_response_code(405);
-    echo json_encode([
-        'success' => 0,
-        'message' => 'Método não permitido. Apenas GET é aceito.',
-    ]);
-    exit;
-}
+if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+    try {
+        $query = "SELECT p.id, p.titulo, p.conteudo, p.url_imagem, p.criado_em, u.nome_admin as usuario_nome, c.nome as categoria_nome FROM postagens p JOIN admin u ON p.usuario_id = u.id JOIN categorias c ON p.categoria_id = c.id";
+        $stmt = $connection->prepare($query);
+        $stmt->execute();
 
-try {
-    // Preparar e executar a consulta SQL
-    $select = "SELECT * FROM exemplo";
-    $stmt = $connection->prepare($select);
-    $stmt->execute();
+        $postagens = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Verificar se há registros
-    if ($stmt->rowCount() > 0) {
-        $vetor_exemplos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        echo json_encode([
-            'success' => 1,
-            'vetor_exemplos' => $vetor_exemplos,
-        ]);
-    } else {
-        echo json_encode([
-            'success' => 0,
-            'message' => 'Nenhum registro encontrado.',
-            'vetor_exemplos' => [],
-        ]);
+        $response = [
+            'success' => true,
+            'data' => $postagens
+        ];
+    } catch (PDOException $e) {
+        $response = [
+            'success' => false,
+            'message' => 'Erro ao buscar postagens: ' . $e->getMessage()
+        ];
     }
-} catch (PDOException $e) {
-    // Definir o código de resposta HTTP para erro interno do servidor
-    http_response_code(500);
-    echo json_encode([
-        'success' => 0,
-        'message' => 'Erro no servidor: ' . $e->getMessage(),
-    ]);
-    exit;
+} else {
+    $response = [
+        'success' => false,
+        'message' => 'Método de requisição inválido'
+    ];
 }
+
+header('Content-Type: application/json');
+echo json_encode($response);
 ?>
