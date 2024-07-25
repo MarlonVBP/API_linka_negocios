@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 try {
     // Obter o ID da postagem dos parâmetros da URL
     $id = $_GET['id'] ?? null;
-    
+
     // Verificar se o ID foi fornecido
     if (!$id) {
         echo json_encode([
@@ -24,9 +24,9 @@ try {
         ]);
         exit;
     }
-    
+
     // Preparar e executar a consulta SQL
-    $select = "SELECT * FROM comentarios_postagens WHERE postagem_id = :id";
+    $select = "SELECT * FROM comentarios_postagens WHERE postagem_id = :id ORDER BY avaliacao DESC, criado_em DESC";
     $stmt = $connection->prepare($select);
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
@@ -37,6 +37,8 @@ try {
 
         // Formatar a data e a avaliação de cada comentário
         foreach ($comentarios as &$comentario) {
+            // Decodificar as entidades HTML
+            $comentario['conteudo'] = html_entity_decode($comentario['conteudo'], ENT_QUOTES, 'UTF-8');
             // Formatar a data
             $date = new DateTime($comentario['criado_em']);
             $comentario['criado_em'] = $date->format('M d, Y');
@@ -45,7 +47,7 @@ try {
             $avaliacao = intval($comentario['avaliacao']); // Certifique-se de que 'avaliacao' é um número inteiro
             $rating_stars = '';
             for ($i = 1; $i <= 5; $i++) {
-                $rating_stars .= $avaliacao >= $i ? '★' : '☆'; // Use '★' para estrela cheia e '☆' para estrela vazia
+                $rating_stars .= $avaliacao >= $i ? '&#9733;' : '&#9734;'; // Use '★' para estrela cheia e '☆' para estrela vazia
             }
             $comentario['avaliacao'] = $rating_stars;
         }
@@ -70,4 +72,3 @@ try {
     ]);
     exit;
 }
-?>

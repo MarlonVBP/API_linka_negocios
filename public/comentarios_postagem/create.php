@@ -103,7 +103,6 @@ try {
         'message' => 'Falha na inserção dos dados'
     ]);
     exit;
-
 } catch (PDOException $e) {
     // Definir código de resposta HTTP para erro interno do servidor
     http_response_code(500);
@@ -113,4 +112,3 @@ try {
     ]);
     exit;
 }
-?>
