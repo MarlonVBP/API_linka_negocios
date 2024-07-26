@@ -1,6 +1,6 @@
 <?php
-include '../../cors.php';
-include '../../conn.php';
+include '../../../cors.php';
+include '../../../conn.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 

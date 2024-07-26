@@ -26,7 +26,7 @@ try {
 
     // Organizar e filtrar os dados recebidos
     $pagina_id = htmlspecialchars(trim($data->id));
-    $user_name = htmlspecialchars(trim($data->nome));
+    $user_name = htmlspecialchars(trim($data->user_name));
     $profissao = htmlspecialchars(trim($data->profissao));
     $email = htmlspecialchars(trim($data->email));
     $conteudo = htmlspecialchars(trim($data->conteudo));

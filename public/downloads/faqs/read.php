@@ -1,6 +1,6 @@
 <?php
-include '../../cors.php';
-include '../../conn.php';
+include '../../../cors.php';
+include '../../../conn.php';
 
 // Verificar se o método de requisição é GET
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -14,23 +14,32 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 try {
     // Preparar e executar a consulta SQL
-    $select = "SELECT * FROM comentarios_paginas";
+    $select = "SELECT id, pergunta, resposta FROM faq";
     $stmt = $connection->prepare($select);
     $stmt->execute();
 
     // Verificar se há registros
     if ($stmt->rowCount() > 0) {
-        $vetor_comentarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $vetor_faqs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Adicionar o campo 'active' com valor false a cada registro
+        foreach ($vetor_faqs as &$faq) {
+            $faq['active'] = false;
+            // Adicionar mensagem se o campo 'resposta' estiver vazio
+            if (empty($faq['resposta'])) {
+                $faq['resposta'] = 'Esta pergunta será respondida em breve';
+            }
+        }
 
         echo json_encode([
             'success' => 1,
-            'vetor_comentarios' => $vetor_comentarios,
+            'response' => $vetor_faqs,
         ]);
     } else {
         echo json_encode([
             'success' => 0,
             'message' => 'Nenhum registro encontrado.',
-            'vetor_comentarios' => [],
+            'response' => [],
         ]);
     }
 } catch (PDOException $e) {
@@ -42,4 +51,3 @@ try {
     ]);
     exit;
 }
-?>
