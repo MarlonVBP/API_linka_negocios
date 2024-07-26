@@ -27,7 +27,9 @@ CREATE TABLE IF NOT EXISTS postagens (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES admin(id) ON DELETE CASCADE,
-    FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE SET NULL
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE
+    SET
+        NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS paginas (
@@ -42,9 +44,12 @@ CREATE TABLE IF NOT EXISTS comentarios_postagens (
     profissao VARCHAR(50),
     email VARCHAR(255) NOT NULL,
     conteudo TEXT NOT NULL,
-    avaliacao INT CHECK (avaliacao >= 1 AND avaliacao <= 5),
+    avaliacao INT CHECK (
+        avaliacao >= 1
+        AND avaliacao <= 5
+    ),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (pagina_id) REFERENCES pagina(id) ON DELETE CASCADE
+    FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS comentarios_paginas (
@@ -54,7 +59,10 @@ CREATE TABLE IF NOT EXISTS comentarios_paginas (
     profissao VARCHAR(50),
     email VARCHAR(255) NOT NULL,
     conteudo TEXT NOT NULL,
-    avaliacao INT CHECK (avaliacao >= 1 AND avaliacao <= 5),
+    avaliacao INT CHECK (
+        avaliacao >= 1
+        AND avaliacao <= 5
+    ),
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (pagina_id) REFERENCES paginas(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -85,9 +93,7 @@ CREATE TABLE IF NOT EXISTS contato (
 
 CREATE TABLE IF NOT EXISTS faq (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    conteudo TEXT,
+    pergunta TEXT NOT NULL,
     resposta TEXT,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-
