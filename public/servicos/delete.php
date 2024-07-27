@@ -4,7 +4,6 @@ include '../../conn.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Permitir apenas requisições DELETE
 if ($method === 'OPTIONS') {
     exit;
 }
@@ -18,57 +17,38 @@ if ($method !== 'DELETE') {
     exit;
 }
 
-// Obter o ID do registro a partir da query string
 $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
 if ($id === null) {
     echo json_encode([
         'success' => 0,
-        'message' => 'Por favor, forneça o ID do post.'
+        'message' => 'ID do registro não fornecido.'
     ]);
     exit;
 }
 
 try {
-    // Verificar se o registro existe
-    $fetch_post = "SELECT * FROM `exemplo` WHERE id_exemplo = :id";
-    $fetch_stmt = $connection->prepare($fetch_post);
-    $fetch_stmt->bindValue(':id', $id, PDO::PARAM_INT);
-    $fetch_stmt->execute();
+    $delete_query = "DELETE FROM servicos WHERE id = :id";
+    $delete_stmt = $connection->prepare($delete_query);
+    $delete_stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
-    if ($fetch_stmt->rowCount() > 0) {
-        // Excluir o registro
-        $delete_post = "DELETE FROM `exemplo` WHERE id_exemplo = :id";
-        $delete_stmt = $connection->prepare($delete_post);
-        $delete_stmt->bindValue(':id', $id, PDO::PARAM_INT);
-
-        if ($delete_stmt->execute()) {
-            echo json_encode([
-                'success' => 1,
-                'message' => 'Registro excluído com sucesso.'
-            ]);
-            exit;
-        } else {
-            echo json_encode([
-                'success' => 0,
-                'message' => 'Falha ao excluir o registro. Algo deu errado.'
-            ]);
-            exit;
-        }
+    if ($delete_stmt->execute()) {
+        http_response_code(200); 
+        echo json_encode([
+            'success' => 1,
+            'message' => 'Serviço excluído com sucesso.'
+        ]);
     } else {
         echo json_encode([
             'success' => 0,
-            'message' => 'ID inválido. Nenhum registro encontrado com o ID fornecido.'
+            'message' => 'Falha na exclusão do serviço.'
         ]);
-        exit;
     }
 } catch (PDOException $e) {
-    // Definir código de resposta HTTP para erro interno do servidor
     http_response_code(500);
     echo json_encode([
         'success' => 0,
         'message' => 'Erro no servidor: ' . $e->getMessage()
     ]);
-    exit;
 }
 ?>
