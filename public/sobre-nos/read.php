@@ -14,23 +14,23 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 try {
     // Preparar e executar a consulta SQL
-    $select = "SELECT * FROM exemplo";
+    $select = "SELECT * FROM contato";
     $stmt = $connection->prepare($select);
     $stmt->execute();
 
     // Verificar se há registros
     if ($stmt->rowCount() > 0) {
-        $vetor_exemplos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $contatos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode([
             'success' => 1,
-            'vetor_exemplos' => $vetor_exemplos,
+            'contatos' => $contatos,
         ]);
     } else {
         echo json_encode([
             'success' => 0,
             'message' => 'Nenhum registro encontrado.',
-            'vetor_exemplos' => [],
+            'contatos' => [],
         ]);
     }
 } catch (PDOException $e) {
