@@ -23,7 +23,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 try {
     // Verificar se estamos inserindo uma pergunta ou uma resposta
-    if (isset($data->pergunta) && !isset($data->id_resposta)) {
+    if (isset($data->pergunta) && !isset($data->id)) {
         // Inserir uma nova pergunta
         $pergunta = htmlspecialchars(trim($data->pergunta));
 
@@ -48,10 +48,10 @@ try {
                 'message' => 'Falha na inserção da pergunta'
             ]);
         }
-    } elseif (isset($data->resposta) && isset($data->id_pergunta)) {
+    } elseif (isset($data->resposta) && isset($data->id)) {
         // Inserir uma resposta associada a uma pergunta existente
         $resposta = htmlspecialchars(trim($data->resposta));
-        $id_pergunta = intval($data->id_pergunta);
+        $id_pergunta = intval($data->id);
 
         // Preparar a consulta SQL para inserção da resposta
         $query = "UPDATE `faq` SET resposta = :resposta WHERE id = :id_pergunta";

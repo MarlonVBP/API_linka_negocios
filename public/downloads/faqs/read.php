@@ -13,8 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    // Preparar e executar a consulta SQL
+    // Obter o parâmetro resposta
+    $resposta = isset($_GET['resposta']) ? filter_var($_GET['resposta'], FILTER_VALIDATE_BOOLEAN) : null;
+
+    // Preparar a consulta SQL base
     $select = "SELECT id, pergunta, resposta FROM faq";
+
+    // Adicionar condição para excluir perguntas com respostas, se necessário
+    if ($resposta === true) {
+        $select .= " WHERE resposta IS NULL OR resposta = ''";
+    }
+
+    // Preparar e executar a consulta SQL
     $stmt = $connection->prepare($select);
     $stmt->execute();
 

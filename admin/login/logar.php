@@ -7,32 +7,34 @@ include 'criarJwt.php';
 $data = json_decode(file_get_contents("php://input"));
 
 try {
-    // Preparar a consulta SQL para verificar as credenciais do administrador
-    $sql = "SELECT * FROM `admin` WHERE email=:email AND senha=:senha";
+    // Preparar a consulta SQL para obter os dados do administrador com o e-mail fornecido
+    $sql = "SELECT * FROM `admin` WHERE email=:email";
     $stmt = $connection->prepare($sql);
     $stmt->bindValue(':email', $data->email, PDO::PARAM_STR);
-    $stmt->bindValue(':senha', $data->senha, PDO::PARAM_STR);
     $stmt->execute();
 
     // Verificar se a consulta retornou algum resultado
     if ($stmt->rowCount() > 0) {
-        // Se as credenciais forem válidas, obter o ID do administrador
+        // Obter os dados do administrador
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Criar o token JWT
-        $token = criar_jwt($user['id'], $data->email, $data->senha);
+        // Verificar a senha fornecida com a senha armazenada no banco de dados
+        if (password_verify($data->senha, $user['senha'])) {
+            // Se as credenciais forem válidas, criar o token JWT
+            $token = criar_jwt($user['id'], $data->email, $data->senha);
 
-        $data = [
-            'token' => $token,
-            'nome' => $user['nome_admin']
-        ];
-        
-        // Enviar a resposta com o token JWT
-        echo json_encode([
-            'success' => 1,
-            'response' => $data
-        ]);
-        exit;
+            $responseData = [
+                'token' => $token,
+                'nome' => $user['nome_admin']
+            ];
+
+            // Enviar a resposta com o token JWT
+            echo json_encode([
+                'success' => 1,
+                'response' => $responseData
+            ]);
+            exit;
+        }
     }
 
     // Se as credenciais forem inválidas, enviar uma resposta de falha ao realizar o login

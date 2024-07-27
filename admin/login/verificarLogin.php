@@ -1,6 +1,6 @@
 <?php
-include '../cors.php';
-include '../conn.php';
+include '../../cors.php';
+include '../../conn.php';
 include 'jwtEhValido.php';
 
 // Obter os dados JSON do corpo da solicitação
