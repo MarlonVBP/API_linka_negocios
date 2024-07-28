@@ -34,7 +34,8 @@ try {
 
             $responseData = [
                 'token' => $token,
-                'nome' => $user['nome_admin']
+                'nome' => $user['nome_admin'],
+                'email' => $data->email // Adiciona o e-mail à resposta
             ];
 
             // Enviar a resposta com o token JWT
@@ -66,3 +67,4 @@ try {
     ]);
     exit;
 }
+?>

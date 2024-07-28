@@ -2,73 +2,66 @@
 include '../../cors.php';
 include '../../conn.php';
 
-$method = $_SERVER['REQUEST_METHOD'];
+$response = [
+    'success' => false,
+    'message' => 'Método de requisição inválido'
+];
 
-// Permitir apenas requisições DELETE
-if ($method === 'OPTIONS') {
-    exit;
-}
+if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    
+    if (isset($data['email'])) {
+        $email = $data['email'];
 
-if ($method !== 'DELETE') {
-    http_response_code(405);
-    echo json_encode([
-        'success' => 0,
-        'message' => 'Método não permitido. Apenas DELETE é aceito.',
-    ]);
-    exit;
-}
+        $sql = "SELECT id FROM admin WHERE email=:email";
+        $stmt = $connection->prepare($sql);
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+        $stmt->execute();
 
-// Obter o ID do registro a partir da query string
-$id = isset($_GET['id']) ? intval($_GET['id']) : null;
+        if ($stmt->rowCount() > 0) {
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $usuario_id = $user['id'];
 
-if ($id === null) {
-    echo json_encode([
-        'success' => 0,
-        'message' => 'Por favor, forneça o ID do post.'
-    ]);
-    exit;
-}
+            if (isset($data['id'])) {
+                $post_id = intval($data['id']);
 
-try {
-    // Verificar se o registro existe
-    $fetch_post = "SELECT * FROM `exemplo` WHERE id_exemplo = :id";
-    $fetch_stmt = $connection->prepare($fetch_post);
-    $fetch_stmt->bindValue(':id', $id, PDO::PARAM_INT);
-    $fetch_stmt->execute();
+                $query = "DELETE FROM postagens WHERE id = :post_id AND usuario_id = :usuario_id";
+                $stmt = $connection->prepare($query);
 
-    if ($fetch_stmt->rowCount() > 0) {
-        // Excluir o registro
-        $delete_post = "DELETE FROM `exemplo` WHERE id_exemplo = :id";
-        $delete_stmt = $connection->prepare($delete_post);
-        $delete_stmt->bindValue(':id', $id, PDO::PARAM_INT);
+                $stmt->bindValue(':post_id', $post_id, PDO::PARAM_INT);
+                $stmt->bindValue(':usuario_id', $usuario_id, PDO::PARAM_INT);
 
-        if ($delete_stmt->execute()) {
-            echo json_encode([
-                'success' => 1,
-                'message' => 'Registro excluído com sucesso.'
-            ]);
-            exit;
+                if ($stmt->execute()) {
+                    $response = [
+                        'success' => true,
+                        'message' => 'Postagem excluída com sucesso'
+                    ];
+                } else {
+                    $response = [
+                        'success' => false,
+                        'message' => 'Falha na exclusão da postagem'
+                    ];
+                }
+            } else {
+                $response = [
+                    'success' => false,
+                    'message' => 'ID da postagem não fornecido'
+                ];
+            }
         } else {
-            echo json_encode([
-                'success' => 0,
-                'message' => 'Falha ao excluir o registro. Algo deu errado.'
-            ]);
-            exit;
+            $response = [
+                'success' => false,
+                'message' => 'Usuário não encontrado'
+            ];
         }
     } else {
-        echo json_encode([
-            'success' => 0,
-            'message' => 'ID inválido. Nenhum registro encontrado com o ID fornecido.'
-        ]);
-        exit;
+        $response = [
+            'success' => false,
+            'message' => 'Email não fornecido'
+        ];
     }
-} catch (PDOException $e) {
-    // Definir código de resposta HTTP para erro interno do servidor
-    http_response_code(500);
-    echo json_encode([
-        'success' => 0,
-        'message' => 'Erro no servidor: ' . $e->getMessage()
-    ]);
-    exit;
 }
+
+header('Content-Type: application/json');
+echo json_encode($response);
 ?>
