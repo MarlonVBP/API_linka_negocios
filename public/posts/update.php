@@ -2,86 +2,99 @@
 include '../../cors.php';
 include '../../conn.php';
 
-$method = $_SERVER['REQUEST_METHOD'];
-
-// Permitir apenas requisições PUT
-if ($method === 'OPTIONS') {
-    exit;
-}
-
-if ($method !== 'PUT') {
-    http_response_code(405);
-    echo json_encode([
-        'success' => 0,
-        'message' => 'Método não permitido. Apenas PUT é aceito.',
-    ]);
-    exit;
-}
-
-// Obter e processar os dados JSON do corpo da solicitação
-$data = json_decode(file_get_contents("php://input"));
-$id = isset($data->id) ? intval($data->id) : null;
-
-if ($id === null) {
-    echo json_encode([
-        'success' => 0,
-        'message' => 'ID do registro não fornecido.'
-    ]);
-    exit;
-}
-
-try {
-    // Verificar se o registro existe
-    $select_query = "SELECT * FROM `exemplo` WHERE id_exemplo = :id_exemplo";
-    $select_stmt = $connection->prepare($select_query);
-    $select_stmt->bindValue(':id_exemplo', $id, PDO::PARAM_INT);
-    $select_stmt->execute();
-
-    if ($select_stmt->rowCount() > 0) {
-        $dado_de_exemplo1 = htmlspecialchars(trim($data->dado1));
-        $dado_de_exemplo2 = htmlspecialchars(trim($data->dado2));
-        $dado_de_exemplo3 = htmlspecialchars(trim($data->dado3));
-        // $exemplo_senha = htmlspecialchars(trim($data->senha)); // Descomente se precisar atualizar a senha
-
-        // Preparar a consulta SQL para atualização
-        $update_query = "UPDATE `exemplo` SET 
-                            dado_de_exemplo1 = :dado_de_exemplo1, 
-                            dado_de_exemplo2 = :dado_de_exemplo2, 
-                            dado_de_exemplo3 = :dado_de_exemplo3 
-                        WHERE id_exemplo = :id_exemplo";
-
-        $update_stmt = $connection->prepare($update_query);
-
-        $update_stmt->bindValue(':dado_de_exemplo1', $dado_de_exemplo1, PDO::PARAM_STR);
-        $update_stmt->bindValue(':dado_de_exemplo2', $dado_de_exemplo2, PDO::PARAM_STR);
-        $update_stmt->bindValue(':dado_de_exemplo3', $dado_de_exemplo3, PDO::PARAM_STR);
-        // $update_stmt->bindValue(':exemplo_senha', $exemplo_senha, PDO::PARAM_STR); // Descomente se precisar atualizar a senha
-
-        $update_stmt->bindValue(':id_exemplo', $id, PDO::PARAM_INT);
-
-        if ($update_stmt->execute()) {
-            http_response_code(200); // Código HTTP 200 para sucesso na atualização
-            echo json_encode([
-                'success' => 1,
-                'message' => 'Dados atualizados com sucesso.'
-            ]);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $email = $_POST['email'];
+    
+    // Obter o ID do usuário baseado no e-mail
+    $sql = "SELECT id FROM admin WHERE email=:email";
+    $stmt = $connection->prepare($sql);
+    $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+    $stmt->execute();
+    
+    if ($stmt->rowCount() > 0) {
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $usuario_id = $user['id'];
+        
+        if (isset($_POST['id']) && isset($_POST['title']) && isset($_POST['content']) && isset($_POST['category_id'])) {
+            $post_id = intval($_POST['id']);
+            $title = trim($_POST['title']);
+            $content = trim($_POST['content']);
+            $category_id = intval($_POST['category_id']);
+            $image_updated = false;
+            
+            // Verifica se uma nova imagem foi fornecida
+            if (isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK) {
+                $image = $_FILES['image']['name'];
+                $target_dir = "imagens/";
+                $target_file = $target_dir . basename($image);
+                
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+                    $image_updated = true;
+                } else {
+                    $response = [
+                        'success' => false,
+                        'message' => 'Erro ao fazer o upload da imagem'
+                    ];
+                    header('Content-Type: application/json');
+                    echo json_encode($response);
+                    exit;
+                }
+            }
+            
+            $query = "UPDATE postagens SET categoria_id = :categoria_id, titulo = :titulo, conteudo = :conteudo";
+            if ($image_updated) {
+                $query .= ", url_imagem = :url_imagem";
+            }
+            $query .= " WHERE id = :post_id AND usuario_id = :usuario_id";
+            
+            $stmt = $connection->prepare($query);
+            
+            $stmt->bindValue(':categoria_id', $category_id, PDO::PARAM_INT);
+            $stmt->bindValue(':titulo', $title, PDO::PARAM_STR);
+            $stmt->bindValue(':conteudo', $content, PDO::PARAM_STR);
+            $stmt->bindValue(':post_id', $post_id, PDO::PARAM_INT);
+            $stmt->bindValue(':usuario_id', $usuario_id, PDO::PARAM_INT);
+            
+            if ($image_updated) {
+                $stmt->bindValue(':url_imagem', $target_file, PDO::PARAM_STR);
+            }
+            
+            if ($stmt->execute()) {
+                $response = [
+                    'success' => true,
+                    'message' => 'Postagem atualizada com sucesso',
+                    'data' => [
+                        'id' => $post_id,
+                        'title' => $title,
+                        'content' => $content,
+                        'category_id' => $category_id,
+                        'image' => $image_updated ? $target_file : null
+                    ]
+                ];
+            } else {
+                $response = [
+                    'success' => false,
+                    'message' => 'Falha na atualização da postagem'
+                ];
+            }
         } else {
-            echo json_encode([
-                'success' => 0,
-                'message' => 'Falha na atualização dos dados.'
-            ]);
+            $response = [
+                'success' => false,
+                'message' => 'Campos obrigatórios não fornecidos'
+            ];
         }
     } else {
-        echo json_encode([
-            'success' => 0,
-            'message' => 'Registro não encontrado para o ID fornecido.'
-        ]);
+        $response = [
+            'success' => false,
+            'message' => 'Usuário não encontrado'
+        ];
     }
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => 0,
-        'message' => 'Erro no servidor: ' . $e->getMessage()
-    ]);
+} else {
+    $response = [
+        'success' => false,
+        'message' => 'Método de requisição inválido'
+    ];
 }
+header('Content-Type: application/json');
+echo json_encode($response);
 ?>
