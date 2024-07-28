@@ -6,6 +6,15 @@ include 'criarJwt.php';
 // Obter os dados JSON do corpo da solicitação
 $data = json_decode(file_get_contents("php://input"));
 
+// Verificar se os campos necessários estão presentes
+if (!isset($data->email) || !isset($data->senha)) {
+    echo json_encode([
+        'success' => 0,
+        'message' => 'Dados insuficientes para login'
+    ]);
+    exit;
+}
+
 try {
     // Preparar a consulta SQL para obter os dados do administrador com o e-mail fornecido
     $sql = "SELECT * FROM `admin` WHERE email=:email";
@@ -37,20 +46,23 @@ try {
         }
     }
 
-    // Se as credenciais forem inválidas, enviar uma resposta de falha ao realizar o login
+    // Se as credenciais forem inválidas, enviar uma resposta genérica de falha ao realizar o login
     echo json_encode([
         'success' => 0,
-        'message' => 'Falha ao realizar o login'
+        'message' => 'Email ou senha inválidos'
     ]);
     exit;
 } catch (Exception $e) { // Usar Exception em vez de PDOException para capturar qualquer tipo de exceção
     // Definir o código de resposta HTTP para erro interno do servidor
     http_response_code(500);
 
+    // Registrar erro (opcional)
+    error_log($e->getMessage());
+
     // Enviar resposta com mensagem de erro
     echo json_encode([
         'success' => 0,
-        'message' => $e->getMessage()
+        'message' => 'Erro interno do servidor'
     ]);
     exit;
 }
