@@ -1,0 +1,113 @@
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [foto_perfil] => novo-link-para-foto
+    [ultimo_login] => 2024-07-29 10:00:00
+)
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [foto_perfil] => novo-link-para-foto
+    [cargo] => Novo Cargo
+    [ultimo_login] => 2024-07-29 10:00:00
+)
+Requisição PUT recebida\nstdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [foto_perfil] => novo-link-para-foto
+    [cargo] => Novo Cargo
+    [ultimo_login] => 2024-07-29 10:00:00
+)
+Verificando registro para o email: masooanjos@gmail.com
+Registro encontrado\nTentando atualizar registro para o email: masooanjos@gmail.com
+Requisição recebida\nstdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [foto_perfil] => novo-link-para-foto
+    [cargo] => Novo Cargo
+    [ultimo_login] => 2024-07-29 10:00:00
+)
+Requisição OPTIONS recebida\nRequisição recebida\nstdClass Object
+(
+    [id] => 1
+    [nome] => Novo Nome
+    [cargo] => Novo Cargo
+    [imagem_url] => novo-link-para-foto
+)
+Requisição OPTIONS recebida\nRequisição recebida\nstdClass Object
+(
+    [id] => 1
+    [nome] => Novo Nomegrtrhyt
+    [cargo] => Novo Cargo
+    [imagem_url] => novo-link-para-foto
+)
+Requisição OPTIONS recebida\nRequisição recebida\nstdClass Object
+(
+    [id] => 1
+    [nome] => Novo Nomegrtrhyt
+    [cargo] => Novo Cargo
+    [imagem_url] => novo-link-para-foto
+)
+Requisição OPTIONS recebida\nRequisição recebida\nstdClass Object
+(
+    [id] => 1
+    [nome] => Novo Nome
+    [cargo] => 
+    [imagem_url] => 
+)
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [senha] => senhaSegura123
+)
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [senha] => senhaSegura123
+)
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [foto_perfil] => novo-link-para-foto111
+    [cargo] => 3T4G5HNH
+    [ultimo_login] => 2024-07-30T01:12:35.742Z
+)
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [foto_perfil] => https://a.imagem.app/39feOl.png
+    [cargo] => 3T4G5HNH
+    [ultimo_login] => 2024-07-30T01:14:43.349Z
+)
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [foto_perfil] => https://a.imagem.app/3chNqG.jpeg
+    [cargo] => 3T4G5HNH
+    [ultimo_login] => 2024-07-30T01:27:24.553Z
+)
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [foto_perfil] => https://a.imagem.app/39feOl.png
+    [cargo] => 3T4G5HNH
+    [ultimo_login] => 2024-07-30T01:31:15.529Z
+)
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Novo Nome
+    [foto_perfil] => https://a.imagem.app/3chNqG.jpeg
+    [cargo] => 3T4G5HNH
+    [ultimo_login] => 2024-07-30T01:37:51.267Z
+)
