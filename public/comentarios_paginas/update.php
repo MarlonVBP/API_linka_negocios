@@ -2,86 +2,43 @@
 include '../../cors.php';
 include '../../conn.php';
 
-$method = $_SERVER['REQUEST_METHOD'];
-
-// Permitir apenas requisições PUT
-if ($method === 'OPTIONS') {
-    exit;
-}
-
-if ($method !== 'PUT') {
+// Verificar se o método de requisição é POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode([
         'success' => 0,
-        'message' => 'Método não permitido. Apenas PUT é aceito.',
-    ]);
-    exit;
-}
-
-// Obter e processar os dados JSON do corpo da solicitação
-$data = json_decode(file_get_contents("php://input"));
-$id = isset($data->id) ? intval($data->id) : null;
-
-if ($id === null) {
-    echo json_encode([
-        'success' => 0,
-        'message' => 'ID do registro não fornecido.'
+        'message' => 'Método não permitido. Apenas POST é aceito.',
     ]);
     exit;
 }
 
 try {
-    // Verificar se o registro existe
-    $select_query = "SELECT * FROM `exemplo` WHERE id_exemplo = :id_exemplo";
-    $select_stmt = $connection->prepare($select_query);
-    $select_stmt->bindValue(':id_exemplo', $id, PDO::PARAM_INT);
-    $select_stmt->execute();
+    // Obter IDs dos comentários que foram visualizados
+    $ids = isset($_POST['ids']) ? $_POST['ids'] : [];
 
-    if ($select_stmt->rowCount() > 0) {
-        $dado_de_exemplo1 = htmlspecialchars(trim($data->dado1));
-        $dado_de_exemplo2 = htmlspecialchars(trim($data->dado2));
-        $dado_de_exemplo3 = htmlspecialchars(trim($data->dado3));
-        // $exemplo_senha = htmlspecialchars(trim($data->senha)); // Descomente se precisar atualizar a senha
-
-        // Preparar a consulta SQL para atualização
-        $update_query = "UPDATE `exemplo` SET 
-                            dado_de_exemplo1 = :dado_de_exemplo1, 
-                            dado_de_exemplo2 = :dado_de_exemplo2, 
-                            dado_de_exemplo3 = :dado_de_exemplo3 
-                        WHERE id_exemplo = :id_exemplo";
-
-        $update_stmt = $connection->prepare($update_query);
-
-        $update_stmt->bindValue(':dado_de_exemplo1', $dado_de_exemplo1, PDO::PARAM_STR);
-        $update_stmt->bindValue(':dado_de_exemplo2', $dado_de_exemplo2, PDO::PARAM_STR);
-        $update_stmt->bindValue(':dado_de_exemplo3', $dado_de_exemplo3, PDO::PARAM_STR);
-        // $update_stmt->bindValue(':exemplo_senha', $exemplo_senha, PDO::PARAM_STR); // Descomente se precisar atualizar a senha
-
-        $update_stmt->bindValue(':id_exemplo', $id, PDO::PARAM_INT);
-
-        if ($update_stmt->execute()) {
-            http_response_code(200); // Código HTTP 200 para sucesso na atualização
-            echo json_encode([
-                'success' => 1,
-                'message' => 'Dados atualizados com sucesso.'
-            ]);
-        } else {
-            echo json_encode([
-                'success' => 0,
-                'message' => 'Falha na atualização dos dados.'
-            ]);
-        }
-    } else {
+    if (empty($ids) || !is_array($ids)) {
         echo json_encode([
             'success' => 0,
-            'message' => 'Registro não encontrado para o ID fornecido.'
+            'message' => 'Nenhum ID fornecido ou formato inválido.',
         ]);
+        exit;
     }
+
+    // Preparar a consulta SQL para atualizar o atributo 'visualizado'
+    $update = "UPDATE comentarios_paginas SET visualizado = false WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")";
+    $stmt = $connection->prepare($update);
+    $stmt->execute();
+
+    echo json_encode([
+        'success' => 1,
+        'message' => 'Comentários atualizados com sucesso.',
+    ]);
 } catch (PDOException $e) {
+    // Definir o código de resposta HTTP para erro interno do servidor
     http_response_code(500);
     echo json_encode([
         'success' => 0,
-        'message' => 'Erro no servidor: ' . $e->getMessage()
+        'message' => 'Erro no servidor: ' . $e->getMessage(),
     ]);
+    exit;
 }
-?>

@@ -13,22 +13,22 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    // Obter o ID da postagem dos parâmetros da URL
-    $id = $_GET['id'] ?? null;
+    // Obter o ID da página dos parâmetros da URL
+    $id = isset($_GET['id']) ? filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT) : null;
 
-    // Verificar se o ID foi fornecido
-    if (!$id) {
-        echo json_encode([
-            'success' => 0,
-            'message' => 'ID da postagem não fornecido.',
-        ]);
-        exit;
+    // Preparar a consulta SQL
+    if ($id !== null && filter_var($id, FILTER_VALIDATE_INT)) {
+        // Se um ID válido for fornecido, filtrar pelo ID
+        $select = "SELECT * FROM comentarios_postagens WHERE postagem_id = :id AND visualizado = true ORDER BY criado_em DESC";
+        $stmt = $connection->prepare($select);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    } else {
+        // Se o ID não for fornecido ou não for válido, retornar todos os comentários visualizados
+        $select = "SELECT * FROM comentarios_postagens WHERE visualizado = true ORDER BY criado_em DESC";
+        $stmt = $connection->prepare($select);
     }
 
-    // Preparar e executar a consulta SQL
-    $select = "SELECT * FROM comentarios_postagens WHERE postagem_id = :id ORDER BY avaliacao DESC, criado_em DESC";
-    $stmt = $connection->prepare($select);
-    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    // Executar a consulta
     $stmt->execute();
 
     // Verificar se há registros
@@ -39,6 +39,7 @@ try {
         foreach ($comentarios as &$comentario) {
             // Decodificar as entidades HTML
             $comentario['conteudo'] = html_entity_decode($comentario['conteudo'], ENT_QUOTES, 'UTF-8');
+
             // Formatar a data
             $date = new DateTime($comentario['criado_em']);
             $comentario['criado_em'] = $date->format('M d, Y');
@@ -56,10 +57,19 @@ try {
             'success' => 1,
             'response' => $comentarios,
         ]);
+
+        // Marcar comentários como visualizados após o administrador os ver
+        $ids = array_column($comentarios, 'id'); // Coletar IDs dos comentários retornados
+        if (!empty($ids)) {
+            $update_select = "UPDATE comentarios_postagens SET visualizado = false WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")";
+            $update_stmt = $connection->prepare($update_select);
+            $update_stmt->execute();
+        }
+
     } else {
         echo json_encode([
             'success' => 0,
-            'message' => 'Nenhum registro encontrado.',
+            'message' => 'Nenhum comentário visualizado encontrado.',
             'response' => [],
         ]);
     }
@@ -72,3 +82,4 @@ try {
     ]);
     exit;
 }
+?>

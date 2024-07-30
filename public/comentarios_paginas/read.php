@@ -16,19 +16,19 @@ try {
     // Obter o ID da página dos parâmetros da URL
     $id = isset($_GET['id']) ? filter_var($_GET['id'], FILTER_SANITIZE_NUMBER_INT) : null;
 
-    // Verificar se o ID foi fornecido e é um número
-    if ($id === null || !filter_var($id, FILTER_VALIDATE_INT)) {
-        echo json_encode([
-            'success' => 0,
-            'message' => 'ID da página inválido.',
-        ]);
-        exit;
+    // Preparar a consulta SQL
+    if ($id !== null && filter_var($id, FILTER_VALIDATE_INT)) {
+        // Se um ID válido for fornecido, filtrar pelo ID
+        $select = "SELECT * FROM comentarios_paginas WHERE pagina_id = :id AND visualizado = true ORDER BY criado_em DESC";
+        $stmt = $connection->prepare($select);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    } else {
+        // Se o ID não for fornecido ou não for válido, retornar todos os comentários visualizados
+        $select = "SELECT * FROM comentarios_paginas WHERE visualizado = true ORDER BY criado_em DESC";
+        $stmt = $connection->prepare($select);
     }
 
-    // Preparar e executar a consulta SQL
-    $select = "SELECT * FROM comentarios_paginas WHERE pagina_id = :id ORDER BY avaliacao DESC, criado_em DESC";
-    $stmt = $connection->prepare($select);
-    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    // Executar a consulta
     $stmt->execute();
 
     // Verificar se há registros
@@ -57,10 +57,19 @@ try {
             'success' => 1,
             'response' => $comentarios,
         ]);
+
+        // Marcar comentários como visualizados após o administrador os ver
+        $ids = array_column($comentarios, 'id'); // Coletar IDs dos comentários retornados
+        if (!empty($ids)) {
+            $update_select = "UPDATE comentarios_paginas SET visualizado = false WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")";
+            $update_stmt = $connection->prepare($update_select);
+            $update_stmt->execute();
+        }
+
     } else {
         echo json_encode([
             'success' => 0,
-            'message' => 'Nenhum registro encontrado.',
+            'message' => 'Nenhum comentário visualizado encontrado.',
             'response' => [],
         ]);
     }
@@ -73,3 +82,4 @@ try {
     ]);
     exit;
 }
+?>

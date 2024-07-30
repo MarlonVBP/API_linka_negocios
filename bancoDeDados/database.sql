@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS paginas (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS `comentarios_postagens`;
+
 CREATE TABLE IF NOT EXISTS comentarios_postagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     postagem_id INT NOT NULL,
@@ -49,9 +51,12 @@ CREATE TABLE IF NOT EXISTS comentarios_postagens (
         avaliacao >= 1
         AND avaliacao <= 5
     ),
+    visualizado BOOLEAN DEFAULT true,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `comentarios_paginas`;
 
 CREATE TABLE IF NOT EXISTS comentarios_paginas (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -64,6 +69,7 @@ CREATE TABLE IF NOT EXISTS comentarios_paginas (
         avaliacao >= 1
         AND avaliacao <= 5
     ),
+    visualizado BOOLEAN DEFAULT true,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (pagina_id) REFERENCES paginas(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
