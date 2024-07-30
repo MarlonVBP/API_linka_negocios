@@ -4,11 +4,15 @@ USE `LinkNegocios`;
 
 CREATE TABLE IF NOT EXISTS admin (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nome_admin VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    nome_admin VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
+    foto_perfil VARCHAR(255),
+    cargo VARCHAR(100),
+    ultimo_login TIMESTAMP,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 CREATE TABLE IF NOT EXISTS categorias (
     id INT AUTO_INCREMENT PRIMARY KEY,
