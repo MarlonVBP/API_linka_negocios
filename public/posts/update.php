@@ -15,11 +15,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         $usuario_id = $user['id'];
         
-        if (isset($_POST['id']) && isset($_POST['title']) && isset($_POST['content']) && isset($_POST['category_id'])) {
+        if (isset($_POST['id']) && isset($_POST['title']) && isset($_POST['content']) && isset($_POST['category_id']) && isset($_POST['description'])) {
             $post_id = intval($_POST['id']);
             $title = trim($_POST['title']);
             $content = trim($_POST['content']);
             $category_id = intval($_POST['category_id']);
+            $description = trim($_POST['description']);
             $image_updated = false;
             
             // Verifica se uma nova imagem foi fornecida
@@ -41,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
             
-            $query = "UPDATE postagens SET categoria_id = :categoria_id, titulo = :titulo, conteudo = :conteudo";
+            $query = "UPDATE postagens SET categoria_id = :categoria_id, titulo = :titulo, conteudo = :conteudo, descricao = :descricao";
             if ($image_updated) {
                 $query .= ", url_imagem = :url_imagem";
             }
@@ -52,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->bindValue(':categoria_id', $category_id, PDO::PARAM_INT);
             $stmt->bindValue(':titulo', $title, PDO::PARAM_STR);
             $stmt->bindValue(':conteudo', $content, PDO::PARAM_STR);
+            $stmt->bindValue(':descricao', $description, PDO::PARAM_STR);
             $stmt->bindValue(':post_id', $post_id, PDO::PARAM_INT);
             $stmt->bindValue(':usuario_id', $usuario_id, PDO::PARAM_INT);
             
@@ -67,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         'id' => $post_id,
                         'title' => $title,
                         'content' => $content,
+                        'description' => $description,
                         'category_id' => $category_id,
                         'image' => $image_updated ? $target_file : null
                     ]
