@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 try {
  // Preparar e executar a consulta SQL
- $select = "SELECT mes, dados_line, dados_bar FROM dashboard ORDER BY id";
+ $select = "SELECT mes, dados FROM dashboard ORDER BY id";
  $stmt = $connection->prepare($select);
  $stmt->execute();
 
@@ -22,14 +22,12 @@ try {
  if ($stmt->rowCount() > 0) {
   $vetor_dados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-  $months = array_column($vetor_dados, 'mes');
-  $dataset1 = array_column($vetor_dados, 'dados_line');
-  $dataset2 = array_column($vetor_dados, 'dados_bar');
+  $mes = array_column($vetor_dados, 'mes');
+  $dados = array_column($vetor_dados, 'dados');
 
   $response[0]= [
-   'mes' => $months,
-   'dados_line' => $dataset1,
-   'dados_bar' => $dataset2,
+   'mes' => $mes,
+   'dados' => $dados,
   ];
 
   echo json_encode([
