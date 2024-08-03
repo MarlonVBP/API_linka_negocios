@@ -123,3 +123,21 @@ CREATE TABLE IF NOT EXISTS dashboard (
     dados INT NOT NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS ProdutoDivulgacao (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo_breve VARCHAR(255) NOT NULL,
+    detalhes_problema_beneficios TEXT,
+    destaque_problemas TEXT,
+    destaque_beneficio1 TEXT,
+    destaque_beneficio2 TEXT,
+    destaque_beneficio3 TEXT,
+    cta VARCHAR(255),
+    imagem_placeholder VARCHAR(255),
+    beneficio1 TEXT,
+    problema_beneficio1 TEXT,
+    beneficio2 TEXT,
+    problema_beneficio2 TEXT,
+    beneficio3 TEXT,
+    problema_beneficio3 TEXT
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;;
