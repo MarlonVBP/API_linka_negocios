@@ -19,7 +19,7 @@ try {
     // Preparar a consulta SQL
     if ($id !== null && filter_var($id, FILTER_VALIDATE_INT)) {
         // Se um ID válido for fornecido, filtrar pelo ID
-        $select = "SELECT * FROM comentarios_postagens WHERE postagem_id = :id AND visualizado = true ORDER BY criado_em DESC";
+        $select = "SELECT * FROM comentarios_postagens WHERE postagem_id = :id ORDER BY criado_em DESC";
         $stmt = $connection->prepare($select);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     } else {
@@ -65,7 +65,6 @@ try {
             $update_stmt = $connection->prepare($update_select);
             $update_stmt->execute();
         }
-
     } else {
         echo json_encode([
             'success' => 0,
@@ -82,4 +81,3 @@ try {
     ]);
     exit;
 }
-?>
