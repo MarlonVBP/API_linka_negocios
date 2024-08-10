@@ -1,6 +1,6 @@
 <?php
-include '../../cors.php';
-include '../../conn.php';
+include '../../cors.php';  
+include '../../conn.php';  
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -18,66 +18,101 @@ if ($method !== 'POST') {
     exit;
 }
 
-// Obter e processar os dados JSON do corpo da solicitação
 $data = json_decode(file_get_contents("php://input"));
 
+if (json_last_error() !== JSON_ERROR_NONE) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => 0,
+        'message' => 'JSON inválido.',
+    ]);
+    exit;
+}
+
+$titulo_breve = htmlspecialchars(trim($data->titulo_breve ?? ''));
+$detalhes_problema_beneficios = htmlspecialchars(trim($data->detalhes_problema_beneficios ?? ''));
+$destaque_problemas = htmlspecialchars(trim($data->destaque_problemas ?? ''));
+$destaque_beneficio1 = htmlspecialchars(trim($data->destaque_beneficio1 ?? ''));
+$destaque_beneficio2 = htmlspecialchars(trim($data->destaque_beneficio2 ?? ''));
+$destaque_beneficio3 = htmlspecialchars(trim($data->destaque_beneficio3 ?? ''));
+$cta = htmlspecialchars(trim($data->cta ?? ''));
+$imagem_placeholder = htmlspecialchars(trim($data->imagem_placeholder ?? ''));
+$beneficio1 = htmlspecialchars(trim($data->beneficio1 ?? ''));
+$problema_beneficio1 = htmlspecialchars(trim($data->problema_beneficio1 ?? ''));
+$beneficio2 = htmlspecialchars(trim($data->beneficio2 ?? ''));
+$problema_beneficio2 = htmlspecialchars(trim($data->problema_beneficio2 ?? ''));
+$beneficio3 = htmlspecialchars(trim($data->beneficio3 ?? ''));
+$problema_beneficio3 = htmlspecialchars(trim($data->problema_beneficio3 ?? ''));
+$porque_clicar = htmlspecialchars(trim($data->porque_clicar ?? ''));
+
+$pergunta1 = htmlspecialchars(trim($data->pergunta1 ?? ''));
+$resposta1 = htmlspecialchars(trim($data->resposta1 ?? ''));
+$pergunta2 = htmlspecialchars(trim($data->pergunta2 ?? ''));
+$resposta2 = htmlspecialchars(trim($data->resposta2 ?? ''));
+$pergunta3 = htmlspecialchars(trim($data->pergunta3 ?? ''));
+$resposta3 = htmlspecialchars(trim($data->resposta3 ?? ''));
+$pergunta4 = htmlspecialchars(trim($data->pergunta4 ?? ''));
+$resposta4 = htmlspecialchars(trim($data->resposta4 ?? ''));
+$pergunta5 = htmlspecialchars(trim($data->pergunta5 ?? ''));
+$resposta5 = htmlspecialchars(trim($data->resposta5 ?? ''));
+
+$query = "INSERT INTO `ProdutoDivulgacao` (
+    titulo_breve,
+    detalhes_problema_beneficios,
+    destaque_problemas,
+    destaque_beneficio1,
+    destaque_beneficio2,
+    destaque_beneficio3,
+    cta,
+    imagem_placeholder,
+    beneficio1,
+    problema_beneficio1,
+    beneficio2,
+    problema_beneficio2,
+    beneficio3,
+    problema_beneficio3,
+    porque_clicar,
+    pergunta1,
+    resposta1,
+    pergunta2,
+    resposta2,
+    pergunta3,
+    resposta3,
+    pergunta4,
+    resposta4,
+    pergunta5,
+    resposta5
+) VALUES (
+    :titulo_breve,
+    :detalhes_problema_beneficios,
+    :destaque_problemas,
+    :destaque_beneficio1,
+    :destaque_beneficio2,
+    :destaque_beneficio3,
+    :cta,
+    :imagem_placeholder,
+    :beneficio1,
+    :problema_beneficio1,
+    :beneficio2,
+    :problema_beneficio2,
+    :beneficio3,
+    :problema_beneficio3,
+    :porque_clicar,
+    :pergunta1,
+    :resposta1,
+    :pergunta2,
+    :resposta2,
+    :pergunta3,
+    :resposta3,
+    :pergunta4,
+    :resposta4,
+    :pergunta5,
+    :resposta5
+)";
+
 try {
-    // Sanitizar os dados recebidos
-    $titulo_breve = htmlspecialchars(trim($data->titulo_breve));
-    $detalhes_problema_beneficios = htmlspecialchars(trim($data->detalhes_problema_beneficios));
-    $destaque_problemas = htmlspecialchars(trim($data->destaque_problemas));
-    $destaque_beneficio1 = htmlspecialchars(trim($data->destaque_beneficio1));
-    $destaque_beneficio2 = htmlspecialchars(trim($data->destaque_beneficio2));
-    $destaque_beneficio3 = htmlspecialchars(trim($data->destaque_beneficio3));
-    $cta = htmlspecialchars(trim($data->cta));
-    $imagem_placeholder = htmlspecialchars(trim($data->imagem_placeholder));
-    $beneficio1 = htmlspecialchars(trim($data->beneficio1));
-    $problema_beneficio1 = htmlspecialchars(trim($data->problema_beneficio1));
-    $beneficio2 = htmlspecialchars(trim($data->beneficio2));
-    $problema_beneficio2 = htmlspecialchars(trim($data->problema_beneficio2));
-    $beneficio3 = htmlspecialchars(trim($data->beneficio3));
-    $problema_beneficio3 = htmlspecialchars(trim($data->problema_beneficio3));
-    $porque_clicar = htmlspecialchars(trim($data->porque_clicar));
-
-    // Preparar a consulta SQL para inserção
-    $query = "INSERT INTO `ProdutoDivulgacao` (
-            titulo_breve,
-            detalhes_problema_beneficios,
-            destaque_problemas,
-            destaque_beneficio1,
-            destaque_beneficio2,
-            destaque_beneficio3,
-            cta,
-            imagem_placeholder,
-            beneficio1,
-            problema_beneficio1,
-            beneficio2,
-            problema_beneficio2,
-            beneficio3,
-            problema_beneficio3,
-            porque_clicar
-            ) 
-            VALUES (
-            :titulo_breve,
-            :detalhes_problema_beneficios,
-            :destaque_problemas,
-            :destaque_beneficio1,
-            :destaque_beneficio2,
-            :destaque_beneficio3,
-            :cta,
-            :imagem_placeholder,
-            :beneficio1,
-            :problema_beneficio1,
-            :beneficio2,
-            :problema_beneficio2,
-            :beneficio3,
-            :problema_beneficio3,
-            :porque_clicar
-            )";
-
     $stmt = $connection->prepare($query);
 
-    // Associar os valores aos parâmetros da consulta
     $stmt->bindValue(':titulo_breve', $titulo_breve, PDO::PARAM_STR);
     $stmt->bindValue(':detalhes_problema_beneficios', $detalhes_problema_beneficios, PDO::PARAM_STR);
     $stmt->bindValue(':destaque_problemas', $destaque_problemas, PDO::PARAM_STR);
@@ -93,10 +128,19 @@ try {
     $stmt->bindValue(':beneficio3', $beneficio3, PDO::PARAM_STR);
     $stmt->bindValue(':problema_beneficio3', $problema_beneficio3, PDO::PARAM_STR);
     $stmt->bindValue(':porque_clicar', $porque_clicar, PDO::PARAM_STR);
+    $stmt->bindValue(':pergunta1', $pergunta1, PDO::PARAM_STR);
+    $stmt->bindValue(':resposta1', $resposta1, PDO::PARAM_STR);
+    $stmt->bindValue(':pergunta2', $pergunta2, PDO::PARAM_STR);
+    $stmt->bindValue(':resposta2', $resposta2, PDO::PARAM_STR);
+    $stmt->bindValue(':pergunta3', $pergunta3, PDO::PARAM_STR);
+    $stmt->bindValue(':resposta3', $resposta3, PDO::PARAM_STR);
+    $stmt->bindValue(':pergunta4', $pergunta4, PDO::PARAM_STR);
+    $stmt->bindValue(':resposta4', $resposta4, PDO::PARAM_STR);
+    $stmt->bindValue(':pergunta5', $pergunta5, PDO::PARAM_STR);
+    $stmt->bindValue(':resposta5', $resposta5, PDO::PARAM_STR);
 
-    // Executar a consulta e verificar se a inserção foi bem-sucedida
     if ($stmt->execute()) {
-        http_response_code(201); // Criado
+        http_response_code(201);
         echo json_encode([
             'success' => 1,
             'message' => 'Dados inseridos com sucesso'
@@ -104,7 +148,6 @@ try {
         exit;
     }
 
-    // Se a inserção falhar, retornar uma mensagem de erro
     echo json_encode([
         'success' => 0,
         'message' => 'Falha na inserção dos dados'
@@ -112,7 +155,6 @@ try {
     exit;
 
 } catch (PDOException $e) {
-    // Definir código de resposta HTTP para erro interno do servidor
     http_response_code(500);
     echo json_encode([
         'success' => 0,
