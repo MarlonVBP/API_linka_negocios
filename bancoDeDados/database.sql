@@ -140,5 +140,15 @@ CREATE TABLE IF NOT EXISTS ProdutoDivulgacao (
     beneficio2 TEXT,
     problema_beneficio2 TEXT,
     beneficio3 TEXT,
-    problema_beneficio3 TEXT
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;;
+    problema_beneficio3 TEXT,
+    pergunta1 TEXT,
+    resposta1 TEXT,
+    pergunta2 TEXT,
+    resposta2 TEXT,
+    pergunta3 TEXT,
+    resposta3 TEXT,
+    pergunta4 TEXT,
+    resposta4 TEXT,
+    pergunta5 TEXT,
+    resposta5 TEXT
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
