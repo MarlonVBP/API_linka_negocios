@@ -24,7 +24,7 @@ try {
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     } else {
         // Se o ID não for fornecido ou não for válido, retornar todos os comentários visualizados
-        $select = "SELECT * FROM comentarios_paginas WHERE visualizado = true ORDER BY criado_em DESC";
+        $select = "SELECT * FROM comentarios_paginas ORDER BY criado_em DESC";
         $stmt = $connection->prepare($select);
     }
 
