@@ -4,7 +4,6 @@ include '../../conn.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Permitir apenas requisições POST
 if ($method === 'OPTIONS') {
     exit;
 }
