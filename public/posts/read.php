@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 			$stmt->execute();
 			$postagensRecente = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		} else {
-			$query2 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.view, 
+			$query2 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, 
 			u.nome_admin as usuario_nome, 
 			c.nome as categoria_nome,
 			COUNT(cmt.id) as numero_comentarios
@@ -27,8 +27,8 @@ FROM postagens p
 JOIN admin u ON p.usuario_id = u.id 
 JOIN categorias c ON p.categoria_id = c.id
 LEFT JOIN comentarios_postagens cmt ON p.id = cmt.postagem_id
-GROUP BY p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.view, u.nome_admin, c.nome
-ORDER BY p.view DESC, p.criado_em ASC
+GROUP BY p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, u.nome_admin, c.nome
+ORDER BY p.views DESC, p.criado_em ASC
 LIMIT 1";
 			$stmt2 = $connection->prepare($query2);
 			$stmt2->execute();
@@ -37,7 +37,7 @@ LIMIT 1";
 			if ($postagensMaisVisto) {
 				$idMaisVisto = $postagensMaisVisto['id'];
 
-				$query3 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.view,
+				$query3 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views,
 				u.nome_admin AS usuario_nome, 
 				c.nome AS categoria_nome,
 				COUNT(cmt.id) AS numero_comentarios
@@ -46,7 +46,7 @@ LIMIT 1";
  JOIN categorias c ON p.categoria_id = c.id
  LEFT JOIN comentarios_postagens cmt ON p.id = cmt.postagem_id
  WHERE p.id != :id 
- GROUP BY p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.view, u.nome_admin, c.nome
+ GROUP BY p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, u.nome_admin, c.nome
  ORDER BY p.criado_em DESC
  LIMIT 3 OFFSET 0";
 
