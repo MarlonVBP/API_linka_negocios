@@ -119,3 +119,11 @@ stdClass Object
     [cargo] => Novo CargoADSDVCB
     [ultimo_login] => 2024-08-03T12:34:21.025Z
 )
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Maria Anjos
+    [foto_perfil] => https://a.imagem.app/39feOl.png
+    [cargo] => 
+    [ultimo_login] => 2024-08-21T20:03:25.260Z
+)

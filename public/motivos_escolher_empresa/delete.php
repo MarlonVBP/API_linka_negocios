@@ -28,7 +28,7 @@ if ($id === null) {
 }
 
 try {
-    $delete_query = "DELETE FROM ProdutoDivulgacao WHERE id = :id";
+    $delete_query = "DELETE FROM motivos_escolher_empresa WHERE id = :id";
     $delete_stmt = $connection->prepare($delete_query);
     $delete_stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
