@@ -58,13 +58,6 @@ try {
             'response' => $comentarios,
         ]);
 
-        // Marcar comentários como visualizados após o administrador os ver
-        $ids = array_column($comentarios, 'id'); // Coletar IDs dos comentários retornados
-        if (!empty($ids)) {
-            $update_select = "UPDATE comentarios_paginas SET visualizado = false WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")";
-            $update_stmt = $connection->prepare($update_select);
-            $update_stmt->execute();
-        }
     } else {
         echo json_encode([
             'success' => 0,

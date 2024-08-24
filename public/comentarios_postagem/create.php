@@ -35,6 +35,7 @@ try {
     $postagem_id = htmlspecialchars(trim($data->id));
     $user_name = htmlspecialchars(trim($data->nome));
     $profissao = htmlspecialchars(trim($data->profissao));
+    $empresa = htmlspecialchars(trim($data->empresa));
     $email = htmlspecialchars(trim($data->email));
     $conteudo = htmlspecialchars(trim($data->conteudo));
     $avaliacao = htmlspecialchars(trim($data->avaliacao));
@@ -63,6 +64,7 @@ try {
             postagem_id,
             user_name,
             profissao,
+            empresa,
             email,
             conteudo,
             avaliacao
@@ -71,6 +73,7 @@ try {
             :postagem_id,
             :user_name,
             :profissao,
+            :empresa,
             :email,
             :conteudo,
             :avaliacao
@@ -82,6 +85,7 @@ try {
     $stmt->bindValue(':postagem_id', $postagem_id, PDO::PARAM_INT);
     $stmt->bindValue(':user_name', $user_name, PDO::PARAM_STR);
     $stmt->bindValue(':profissao', $profissao, PDO::PARAM_STR);
+    $stmt->bindValue(':empresa', $empresa, PDO::PARAM_STR);
     $stmt->bindValue(':email', $email, PDO::PARAM_STR);
     $stmt->bindValue(':conteudo', $conteudo, PDO::PARAM_STR);
     $stmt->bindValue(':avaliacao', $avaliacao, PDO::PARAM_INT);

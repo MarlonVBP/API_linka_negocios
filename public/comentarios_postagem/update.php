@@ -25,7 +25,7 @@ try {
     }
 
     // Preparar a consulta SQL para atualizar o atributo 'visualizado'
-    $update = "UPDATE comentarios_postagens SET visualizado = false WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")";
+    $update = "UPDATE comentarios_postagens SET visualizado = true WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")";
     $stmt = $connection->prepare($update);
     $stmt->execute();
 
@@ -42,4 +42,7 @@ try {
     ]);
     exit;
 }
+
+// Fechar a conexão
+$connection = null;
 ?>
