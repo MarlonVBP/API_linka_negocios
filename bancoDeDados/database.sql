@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS admin (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-
 CREATE TABLE IF NOT EXISTS categorias (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -30,7 +29,7 @@ CREATE TABLE IF NOT EXISTS postagens (
     descricao TEXT NOT NULL,
     url_imagem VARCHAR(255),
     fixo BOOLEAN DEFAULT false,
-    view INT NOT NULL,
+    views INT NOT NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES admin(id) ON DELETE CASCADE,
@@ -51,6 +50,7 @@ CREATE TABLE IF NOT EXISTS comentarios_postagens (
     postagem_id INT NOT NULL,
     user_name VARCHAR(50) NOT NULL,
     profissao VARCHAR(50),
+    empresa VARCHAR(50),
     email VARCHAR(255) NOT NULL,
     conteudo TEXT NOT NULL,
     avaliacao INT CHECK (
@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS comentarios_paginas (
     pagina_id INT NOT NULL,
     user_name VARCHAR(50) NOT NULL,
     profissao VARCHAR(50),
+    empresa VARCHAR(50),
     email VARCHAR(255) NOT NULL,
     conteudo TEXT NOT NULL,
     avaliacao INT CHECK (
@@ -101,6 +102,7 @@ CREATE TABLE IF NOT EXISTS contato (
     empresa VARCHAR(100),
     area_atuacao VARCHAR(100),
     mensagem TEXT,
+    visualizado BOOLEAN DEFAULT true,
     data_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -155,13 +157,13 @@ CREATE TABLE IF NOT EXISTS ProdutoDivulgacao (
     resposta5 TEXT
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-CREATE TABLE motivos_escolher_empresa (
+CREATE TABLE IF NOT EXISTS motivos_escolher_empresa (
     id INT AUTO_INCREMENT PRIMARY KEY,
     imagem VARCHAR(255) NOT NULL,
     titulo VARCHAR(255) NOT NULL,
     descricao TEXT NOT NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS motivos_escolher_empresa (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -170,5 +172,3 @@ CREATE TABLE IF NOT EXISTS motivos_escolher_empresa (
     imagem VARCHAR(255) NOT NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-
