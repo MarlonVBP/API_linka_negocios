@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 try {
     // Obter IDs dos comentários que foram visualizados
-    $ids = isset($_POST['ids']) ? $_POST['ids'] : [];
+    $ids = isset($_POST) ? $_POST : [];
 
     if (empty($ids) || !is_array($ids)) {
         echo json_encode([
