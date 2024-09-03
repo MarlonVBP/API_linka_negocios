@@ -135,3 +135,11 @@ stdClass Object
     [cargo] => Gerente de TI
     [ultimo_login] => 2024-08-24T19:44:39.904Z
 )
+stdClass Object
+(
+    [email] => maria.anjos@example.com
+    [nome_admin] => maria anjos
+    [foto_perfil] => https://images.pexels.com/photos/6347963/pexels-photo-6347963.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1
+    [cargo] => Gerente de TI
+    [ultimo_login] => 2024-09-02T11:36:33.710Z
+)

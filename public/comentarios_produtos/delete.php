@@ -34,7 +34,7 @@ try {
     $connection->beginTransaction();
 
     // Verificar se o registro existe e obter o ID da postagem
-    $fetch_post = "SELECT postagem_id FROM `comentarios_postagens` WHERE id = :id";
+    $fetch_post = "SELECT produto_id FROM `comentarios_produtos` WHERE id = :id";
     $fetch_stmt = $connection->prepare($fetch_post);
     $fetch_stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $fetch_stmt->execute();
@@ -42,10 +42,10 @@ try {
     $comment = $fetch_stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($comment) {
-        $postagem_id = $comment['postagem_id'];
+        $produto_id = $comment['produto_id'];
 
         // Excluir o registro
-        $delete_post = "DELETE FROM `comentarios_postagens` WHERE id = :id";
+        $delete_post = "DELETE FROM `comentarios_produtos` WHERE id = :id";
         $delete_stmt = $connection->prepare($delete_post);
         $delete_stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
@@ -53,9 +53,9 @@ try {
             // Atualizar o número de comentários
             $queryUpdate = "UPDATE `postagens` 
                             SET comentarios = comentarios - 1 
-                            WHERE id = :postagem_id";
+                            WHERE id = :produto_id";
             $stmtUpdate = $connection->prepare($queryUpdate);
-            $stmtUpdate->bindValue(':postagem_id', $postagem_id, PDO::PARAM_INT);
+            $stmtUpdate->bindValue(':produto_id', $produto_id, PDO::PARAM_INT);
             $stmtUpdate->execute();
 
             // Commit da transação

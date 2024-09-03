@@ -32,8 +32,8 @@ if (!$data) {
 
 try {
     // Organizar e filtrar os dados recebidos
-    $postagem_id = htmlspecialchars(trim($data->id));
-    $user_name = htmlspecialchars(trim($data->nome));
+    $produto_id = htmlspecialchars(trim($data->id));
+    $user_name = htmlspecialchars(trim($data->user_name));
     $profissao = htmlspecialchars(trim($data->profissao));
     $empresa = htmlspecialchars(trim($data->empresa));
     $email = htmlspecialchars(trim($data->email));
@@ -41,7 +41,7 @@ try {
     $avaliacao = htmlspecialchars(trim($data->avaliacao));
 
     // Validar os dados
-    if (empty($postagem_id) || empty($user_name) || empty($profissao) || empty($email) || empty($conteudo) || empty($avaliacao)) {
+    if (empty($produto_id) || empty($user_name) || empty($profissao) || empty($email) || empty($conteudo) || empty($avaliacao)) {
         http_response_code(400);
         echo json_encode([
             'success' => 0,
@@ -60,8 +60,8 @@ try {
     }
 
     // Preparar a consulta SQL para inserção
-    $query = "INSERT INTO `comentarios_postagens` (
-            postagem_id,
+    $query = "INSERT INTO `comentarios_produtos` (
+            produto_id,
             user_name,
             profissao,
             empresa,
@@ -70,7 +70,7 @@ try {
             avaliacao
             ) 
             VALUES (
-            :postagem_id,
+            :produto_id,
             :user_name,
             :profissao,
             :empresa,
@@ -82,7 +82,7 @@ try {
     $stmt = $connection->prepare($query);
 
     // Associar os valores aos parâmetros da consulta
-    $stmt->bindValue(':postagem_id', $postagem_id, PDO::PARAM_INT);
+    $stmt->bindValue(':produto_id', $produto_id, PDO::PARAM_INT);
     $stmt->bindValue(':user_name', $user_name, PDO::PARAM_STR);
     $stmt->bindValue(':profissao', $profissao, PDO::PARAM_STR);
     $stmt->bindValue(':empresa', $empresa, PDO::PARAM_STR);
@@ -94,10 +94,10 @@ try {
     if ($stmt->execute()) {
         $queryUpdate = "UPDATE `postagens` 
         SET comentarios = comentarios + 1 
-        WHERE id = :postagem_id";
+        WHERE id = :produto_id";
         $stmtUpdate = $connection->prepare($queryUpdate);
 
-        $stmtUpdate->bindValue(':postagem_id', $postagem_id, PDO::PARAM_INT);
+        $stmtUpdate->bindValue(':produto_id', $produto_id, PDO::PARAM_INT);
         $stmtUpdate->execute();
 
         http_response_code(201); // Criado
