@@ -32,6 +32,9 @@ try {
     $titulo = htmlspecialchars(trim($data->titulo));
     $descricao = htmlspecialchars(trim($data->descricao));
     $imagem = htmlspecialchars(trim($data->imagem));
+    $conteudo1 = htmlspecialchars(trim($data->conteudo1));
+    $conteudo2 = htmlspecialchars(trim($data->conteudo2));
+    $conteudo3 = htmlspecialchars(trim($data->conteudo3));
 
     if (empty($titulo) || empty($descricao) || empty($imagem)) {
         http_response_code(400);
@@ -45,12 +48,18 @@ try {
     $query = "INSERT INTO `servicos` (
             titulo,
             descricao,
-            imagem
+            imagem,
+            conteudo1,
+            conteudo2,
+            conteudo3
             ) 
             VALUES (
             :titulo,
             :descricao,
-            :imagem
+            :imagem,
+            :conteudo1,
+            :conteudo2,
+            :conteudo3
             )";
 
     $stmt = $connection->prepare($query);
@@ -58,9 +67,12 @@ try {
     $stmt->bindValue(':titulo', $titulo, PDO::PARAM_STR);
     $stmt->bindValue(':descricao', $descricao, PDO::PARAM_STR);
     $stmt->bindValue(':imagem', $imagem, PDO::PARAM_STR);
+    $stmt->bindValue(':conteudo1', $conteudo1, PDO::PARAM_STR);
+    $stmt->bindValue(':conteudo2', $conteudo2, PDO::PARAM_STR);
+    $stmt->bindValue(':conteudo3', $conteudo3, PDO::PARAM_STR);
 
     if ($stmt->execute()) {
-        http_response_code(201); 
+        http_response_code(201);
         echo json_encode([
             'success' => 1,
             'message' => 'Serviço inserido com sucesso'
@@ -73,7 +85,6 @@ try {
         'message' => 'Falha na inserção do serviço'
     ]);
     exit;
-
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode([
@@ -82,4 +93,3 @@ try {
     ]);
     exit;
 }
-?>

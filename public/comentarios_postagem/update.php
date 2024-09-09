@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 try {
     // Obter IDs dos comentários que foram visualizados
-    $ids = isset($_POST['ids']) ? $_POST['ids'] : [];
+    $ids = isset($_POST) ? $_POST : [];
 
     if (empty($ids) || !is_array($ids)) {
         echo json_encode([
@@ -25,7 +25,7 @@ try {
     }
 
     // Preparar a consulta SQL para atualizar o atributo 'visualizado'
-    $update = "UPDATE comentarios_postagens SET visualizado = true WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")";
+    $update = "UPDATE comentarios_postagens SET visualizado = false WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")";
     $stmt = $connection->prepare($update);
     $stmt->execute();
 

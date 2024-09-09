@@ -14,20 +14,31 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 try {
     // Obter IDs dos comentários que foram visualizados
-    $ids = isset($_POST) ? $_POST : [];
+    $ids = isset($_POST['ids']) ? $_POST['ids'] : [];
 
     if (empty($ids) || !is_array($ids)) {
         echo json_encode([
             'success' => 0,
-            'message' => 'Nenhum ID fornecido ou formato inválido.',
+            'message' => 'IDs inválidos.',
+        ]);
+        exit;
+    }
+
+    // Sanitize and validate IDs
+    $ids = array_map('intval', $ids);
+    if (empty($ids)) {
+        echo json_encode([
+            'success' => 0,
+            'message' => 'Nenhum ID válido fornecido.',
         ]);
         exit;
     }
 
     // Preparar a consulta SQL para atualizar o atributo 'visualizado'
-    $update = "UPDATE comentarios_paginas SET visualizado = false WHERE id IN (" . implode(',', array_map('intval', $ids)) . ")";
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $update = "UPDATE comentarios_produtos SET visualizado = false WHERE id IN ($placeholders)";
     $stmt = $connection->prepare($update);
-    $stmt->execute();
+    $stmt->execute($ids);
 
     echo json_encode([
         'success' => 1,
@@ -40,5 +51,8 @@ try {
         'success' => 0,
         'message' => 'Erro no servidor: ' . $e->getMessage(),
     ]);
-    exit;
+} finally {
+    // Fechar a conexão
+    $connection = null;
 }
+?>

@@ -9,6 +9,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 		$postagensRecente = [];
 
 		if ($id) {
+			$updateQuery = "UPDATE postagens SET views = views + 1 WHERE id = :id";
+			$updateStmt = $connection->prepare($updateQuery);
+			$updateStmt->bindParam(':id', $id, PDO::PARAM_INT);
+			$updateStmt->execute();
+
 			$query = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, u.nome_admin as usuario_nome, c.nome as categoria_nome 
                       FROM postagens p 
                       JOIN admin u ON p.usuario_id = u.id 
@@ -19,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 			$stmt->execute();
 			$postagensRecente = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		} else {
-			$query2 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, 
+			$query2 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, p.comentarios,
 			u.nome_admin as usuario_nome, 
 			c.nome as categoria_nome,
 			COUNT(cmt.id) as numero_comentarios
@@ -37,7 +42,7 @@ LIMIT 1";
 			if ($postagensMaisVisto) {
 				$idMaisVisto = $postagensMaisVisto['id'];
 
-				$query3 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views,
+				$query3 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, p.comentarios,
 				u.nome_admin AS usuario_nome, 
 				c.nome AS categoria_nome,
 				COUNT(cmt.id) AS numero_comentarios
