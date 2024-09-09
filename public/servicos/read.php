@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    $query = "SELECT id, titulo, descricao, imagem FROM servicos";
+    $query = "SELECT id, titulo, descricao, imagem, conteudo1, conteudo2, conteudo3 FROM servicos";
     $stmt = $connection->prepare($query);
     $stmt->execute();
 

@@ -166,6 +166,9 @@ CREATE TABLE IF NOT EXISTS servicos (
     titulo VARCHAR(255) NOT NULL,
     descricao TEXT NOT NULL,
     imagem VARCHAR(255) NOT NULL,
+    conteudo1 TEXT NOT NULL,
+    conteudo2 TEXT NOT NULL,
+    conteudo3 TEXT NOT NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

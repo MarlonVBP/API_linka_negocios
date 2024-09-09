@@ -38,11 +38,17 @@ try {
         $titulo = isset($data->titulo) ? htmlspecialchars(trim($data->titulo)) : null;
         $descricao = isset($data->descricao) ? htmlspecialchars(trim($data->descricao)) : null;
         $imagem = isset($data->imagem) ? htmlspecialchars(trim($data->imagem)) : null;
+        $conteudo1 = htmlspecialchars(trim($data->conteudo1));
+        $conteudo2 = htmlspecialchars(trim($data->conteudo2));
+        $conteudo3 = htmlspecialchars(trim($data->conteudo3));
 
         $update_query = "UPDATE servicos SET 
                             titulo = :titulo, 
                             descricao = :descricao, 
-                            imagem = :imagem 
+                            imagem = :imagem,
+                            conteudo1 = :conteudo1,
+                            conteudo2 = :conteudo2,
+                            conteudo3 = :conteudo3
                         WHERE id = :id";
 
         $update_stmt = $connection->prepare($update_query);
@@ -50,10 +56,13 @@ try {
         $update_stmt->bindValue(':titulo', $titulo, PDO::PARAM_STR);
         $update_stmt->bindValue(':descricao', $descricao, PDO::PARAM_STR);
         $update_stmt->bindValue(':imagem', $imagem, PDO::PARAM_STR);
+        $update_stmt->bindValue(':conteudo1', $conteudo1, PDO::PARAM_STR);
+        $update_stmt->bindValue(':conteudo2', $conteudo2, PDO::PARAM_STR);
+        $update_stmt->bindValue(':conteudo3', $conteudo3, PDO::PARAM_STR);
         $update_stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
         if ($update_stmt->execute()) {
-            http_response_code(200); 
+            http_response_code(200);
             echo json_encode([
                 'success' => 1,
                 'message' => 'Dados atualizados com sucesso.'
@@ -77,4 +86,3 @@ try {
         'message' => 'Erro no servidor: ' . $e->getMessage()
     ]);
 }
-?>
