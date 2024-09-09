@@ -81,6 +81,18 @@ CREATE TABLE IF NOT EXISTS comentarios_paginas (
     FOREIGN KEY (pagina_id) REFERENCES paginas(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS avaliacao_empresa (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL,
+    avaliacao INT NOT NULL CHECK (
+        avaliacao >= 1
+        AND avaliacao <= 5
+    ),
+    mensagem VARCHAR(255) NOT NULL,
+    foto_perfil VARCHAR(255),
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS tags (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL
