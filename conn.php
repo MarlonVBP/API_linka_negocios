@@ -1,18 +1,25 @@
 <?php
-// Definição do timezone para São Paulo América do Sul.
+// Definição do timezone para São Paulo América do Sul
 date_default_timezone_set('America/Sao_Paulo');
 
-$host = "localhost"; // endereço do servidor
-$database = "LinkNegocios"; // nome do banco de dados
-$usuario = "root"; // usuário do MySQL
-$senha = ""; // senha do MySQL
+// Credenciais do banco de dados
+$host = "br440";
+$database = "linkan76_linka_negocios";
+$usuario = "linkan76_linka_negocios";
+$senha = 'L!nK@H0sT_N$g-';
 
-// Cria a conexão
+// Criação da conexão com o banco de dados usando PDO
 try {
-	$connection = new PDO('mysql:host=' . $host . ';dbname=' . $database, $usuario, $senha);
-	$connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $dsn = 'mysql:host=' . $host . ';dbname=' . $database;
+    $options = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ];
+
+    $connection = new PDO($dsn, $usuario, $senha, $options);
 } catch (PDOException $e) {
-	echo "Connection error " . $e->getMessage();
-	exit;
+    echo "Erro na conexão: " . $e->getMessage();
+    exit;
 }
 ?>

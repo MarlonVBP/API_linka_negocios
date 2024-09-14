@@ -52,8 +52,7 @@ LIMIT 1";
  LEFT JOIN comentarios_postagens cmt ON p.id = cmt.postagem_id
  WHERE p.id != :id 
  GROUP BY p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, u.nome_admin, c.nome
- ORDER BY p.criado_em DESC
- LIMIT 3 OFFSET 0";
+ ORDER BY p.criado_em DESC";
 
 				$stmt3 = $connection->prepare($query3);
 				$stmt3->bindParam(':id', $idMaisVisto, PDO::PARAM_INT);

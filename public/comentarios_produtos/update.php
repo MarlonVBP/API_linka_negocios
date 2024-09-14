@@ -14,18 +14,27 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 try {
     // Obter IDs dos comentários que foram visualizados
-    $ids = isset($_POST['ids']) ? $_POST['ids'] : [];
+    $data = file_get_contents('php://input');
+    $json = json_decode($data, true);
+
+    // Verificar se o JSON foi decodificado corretamente
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        throw new Exception('Erro ao decodificar JSON');
+    }
+
+    $ids = isset($json['ids']) ? $json['ids'] : [];
 
     if (empty($ids) || !is_array($ids)) {
         echo json_encode([
             'success' => 0,
-            'message' => 'IDs inválidos.',
+            'message' => 'IDs inválidos. Verifique o formato dos IDs.',
         ]);
         exit;
     }
 
-    // Sanitize and validate IDs
+    // Sanitizar e validar IDs
     $ids = array_map('intval', $ids);
+
     if (empty($ids)) {
         echo json_encode([
             'success' => 0,
@@ -45,11 +54,16 @@ try {
         'message' => 'Comentários atualizados com sucesso.',
     ]);
 } catch (PDOException $e) {
-    // Definir o código de resposta HTTP para erro interno do servidor
     http_response_code(500);
     echo json_encode([
         'success' => 0,
         'message' => 'Erro no servidor: ' . $e->getMessage(),
+    ]);
+} catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => 0,
+        'message' => 'Erro na requisição: ' . $e->getMessage(),
     ]);
 } finally {
     // Fechar a conexão
