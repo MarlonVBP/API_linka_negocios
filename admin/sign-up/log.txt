@@ -143,3 +143,19 @@ stdClass Object
     [cargo] => Gerente de TI
     [ultimo_login] => 2024-09-02T11:36:33.710Z
 )
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Maria Anjos
+    [foto_perfil] => NULL
+    [cargo] => Administrador
+    [ultimo_login] => 2024-09-16T00:30:53.702Z
+)
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Maria Anjos
+    [foto_perfil] => https://a.imagem.app/39feOl.png
+    [cargo] => Administrador
+    [ultimo_login] => 2024-09-16T00:31:00.286Z
+)

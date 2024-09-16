@@ -56,12 +56,12 @@ try {
             http_response_code(200); 
             echo json_encode([
                 'success' => 1,
-                'message' => 'Caso de sucesso atualizado com sucesso.'
+                'message' => 'Equipe atualizada com sucesso.'
             ]);
         } else {
             echo json_encode([
                 'success' => 0,
-                'message' => 'Falha na atualização do caso de sucesso.'
+                'message' => 'Falha na atualização da equipe.'
             ]);
         }
     } else {
