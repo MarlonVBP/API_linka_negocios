@@ -143,3 +143,11 @@ stdClass Object
     [cargo] => Gerente de TI
     [ultimo_login] => 2024-09-02T11:36:33.710Z
 )
+stdClass Object
+(
+    [email] => marlon.passos@example.com
+    [nome_admin] => marlon passos
+    [foto_perfil] => https://images.pexels.com/photos/6510389/pexels-photo-6510389.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1
+    [cargo] => Gerente de TI
+    [ultimo_login] => 2024-09-14T16:01:45.487Z
+)
