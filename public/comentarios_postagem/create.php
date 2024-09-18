@@ -1,6 +1,7 @@
 <?php
 include '../../cors.php';
 include '../../conn.php';
+include '../../variaveis_globais/secretKey.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -31,6 +32,27 @@ if (!$data) {
 }
 
 try {
+    $token = $data->recaptcha;
+    if (empty($token)) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => 0,
+            'message' => 'Token reCAPTCHA não fornecido.'
+        ]);
+        exit;
+    }
+
+    $response = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret={$secretKey}&response={$token}");
+    $result = json_decode($response);
+
+    if (!$result->success || $result->score < 0.5) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => 0,
+            'message' => 'Erro de captcha, por favor tentar novamente...'
+        ]);
+        exit;
+    }
     // Organizar e filtrar os dados recebidos
     $postagem_id = htmlspecialchars(trim($data->id));
     $user_name = htmlspecialchars(trim($data->nome));
