@@ -145,9 +145,25 @@ stdClass Object
 )
 stdClass Object
 (
+<<<<<<< HEAD
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Maria Anjos
+    [foto_perfil] => NULL
+    [cargo] => Administrador
+    [ultimo_login] => 2024-09-16T00:30:53.702Z
+)
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Maria Anjos
+    [foto_perfil] => https://a.imagem.app/39feOl.png
+    [cargo] => Administrador
+    [ultimo_login] => 2024-09-16T00:31:00.286Z
+=======
     [email] => marlon.passos@example.com
     [nome_admin] => marlon passos
     [foto_perfil] => https://images.pexels.com/photos/6510389/pexels-photo-6510389.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1
     [cargo] => Gerente de TI
     [ultimo_login] => 2024-09-14T16:01:45.487Z
+>>>>>>> 205c8af36ad2f983c9b7c9db4d96af9f5904aaa3
 )
