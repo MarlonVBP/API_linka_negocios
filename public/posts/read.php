@@ -14,6 +14,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 			$updateStmt->bindParam(':id', $id, PDO::PARAM_INT);
 			$updateStmt->execute();
 
+			$dados = 1;
+			$mes = date('m');
+			$insetQuery = "INSERT INTO dashboard (mes, dados) VALUES (:mes, :dados)";
+			$insetStmt = $connection->prepare($insetQuery);
+			$insetStmt->bindParam(':mes', $mes, PDO::PARAM_INT);
+			$insetStmt->bindParam(':dados', $dados, PDO::PARAM_INT);
+			$insetStmt->execute();
+
 			$query = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, u.nome_admin as usuario_nome, c.nome as categoria_nome 
                       FROM postagens p 
                       JOIN admin u ON p.usuario_id = u.id 
