@@ -167,3 +167,11 @@ stdClass Object
     [ultimo_login] => 2024-09-14T16:01:45.487Z
 >>>>>>> 205c8af36ad2f983c9b7c9db4d96af9f5904aaa3
 )
+stdClass Object
+(
+    [email] => masooanjos@gmail.com
+    [nome_admin] => Maria Anjos
+    [foto_perfil] => https://a.imagem.app/39feOl.png
+    [cargo] => Administrador
+    [ultimo_login] => 2024-09-19T00:50:00.569Z
+)
