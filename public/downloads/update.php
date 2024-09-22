@@ -43,11 +43,8 @@ try {
         $destaque_beneficio3 = isset($data->destaque_beneficio3) ? htmlspecialchars(trim($data->destaque_beneficio3)) : null;
         $cta = isset($data->cta) ? htmlspecialchars(trim($data->cta)) : null;
         $imagem_placeholder = isset($data->imagem_placeholder) ? htmlspecialchars(trim($data->imagem_placeholder)) : null;
-        $beneficio1 = isset($data->beneficio1) ? htmlspecialchars(trim($data->beneficio1)) : null;
         $problema_beneficio1 = isset($data->problema_beneficio1) ? htmlspecialchars(trim($data->problema_beneficio1)) : null;
-        $beneficio2 = isset($data->beneficio2) ? htmlspecialchars(trim($data->beneficio2)) : null;
         $problema_beneficio2 = isset($data->problema_beneficio2) ? htmlspecialchars(trim($data->problema_beneficio2)) : null;
-        $beneficio3 = isset($data->beneficio3) ? htmlspecialchars(trim($data->beneficio3)) : null;
         $problema_beneficio3 = isset($data->problema_beneficio3) ? htmlspecialchars(trim($data->problema_beneficio3)) : null;
         $porque_clicar = isset($data->porque_clicar) ? htmlspecialchars(trim($data->porque_clicar)) : null;
         $pergunta1 = isset($data->pergunta1) ? htmlspecialchars(trim($data->pergunta1)) : null;
@@ -70,11 +67,8 @@ try {
                             destaque_beneficio3 = :destaque_beneficio3,
                             cta = :cta,
                             imagem_placeholder = :imagem_placeholder,
-                            beneficio1 = :beneficio1,
                             problema_beneficio1 = :problema_beneficio1,
-                            beneficio2 = :beneficio2,
                             problema_beneficio2 = :problema_beneficio2,
-                            beneficio3 = :beneficio3,
                             problema_beneficio3 = :problema_beneficio3,
                             porque_clicar = :porque_clicar,
                             pergunta1 = :pergunta1,
@@ -99,11 +93,8 @@ try {
         $update_stmt->bindValue(':destaque_beneficio3', $destaque_beneficio3, PDO::PARAM_STR);
         $update_stmt->bindValue(':cta', $cta, PDO::PARAM_STR);
         $update_stmt->bindValue(':imagem_placeholder', $imagem_placeholder, PDO::PARAM_STR);
-        $update_stmt->bindValue(':beneficio1', $beneficio1, PDO::PARAM_STR);
         $update_stmt->bindValue(':problema_beneficio1', $problema_beneficio1, PDO::PARAM_STR);
-        $update_stmt->bindValue(':beneficio2', $beneficio2, PDO::PARAM_STR);
         $update_stmt->bindValue(':problema_beneficio2', $problema_beneficio2, PDO::PARAM_STR);
-        $update_stmt->bindValue(':beneficio3', $beneficio3, PDO::PARAM_STR);
         $update_stmt->bindValue(':problema_beneficio3', $problema_beneficio3, PDO::PARAM_STR);
         $update_stmt->bindValue(':porque_clicar', $porque_clicar, PDO::PARAM_STR);
         $update_stmt->bindValue(':pergunta1', $pergunta1, PDO::PARAM_STR);
