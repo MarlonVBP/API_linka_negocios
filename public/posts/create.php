@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $stmt->bindValue(':categoria_id', $category_id, PDO::PARAM_INT);
                     $stmt->bindValue(':titulo', $title, PDO::PARAM_STR);
                     $stmt->bindValue(':conteudo', $content, PDO::PARAM_STR);
-                    $stmt->bindValue(':descricao', $content, PDO::PARAM_STR);
+                    $stmt->bindValue(':descricao', $description, PDO::PARAM_STR);
                     $stmt->bindValue(':url_imagem', $target_file, PDO::PARAM_STR);
 
                     if ($stmt->execute()) {
