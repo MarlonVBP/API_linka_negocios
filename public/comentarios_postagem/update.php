@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode([
         'success' => 0,
-        'message' => 'Método não permitido. Apenas POST é aceito.',
+        'message' => 'Metodo nao permitido. Apenas POST e aceito.',
     ]);
     exit;
 }

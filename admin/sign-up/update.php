@@ -17,7 +17,7 @@ if ($method !== 'PUT') {
     http_response_code(405);
     echo json_encode([
         'success' => 0,
-        'message' => 'Método não permitido. Apenas PUT é aceito.',
+        'message' => 'Metodo nao permitido. Apenas PUT e aceito.',
     ]);
     exit;
 }

@@ -3,6 +3,21 @@ include '../../cors.php';
 include '../../conn.php';
 include 'criarJwt.php';
 
+$method = $_SERVER['REQUEST_METHOD'];
+
+if ($method === 'OPTIONS') {
+    exit;
+}
+
+if ($method !== 'POST') {
+    http_response_code(405);
+    echo json_encode([
+        'success' => 0,
+        'message' => 'Metodo nao permitido. Apenas POST e permitido.',
+    ]);
+    exit;
+}
+
 // Obter os dados JSON do corpo da solicitação
 $data = json_decode(file_get_contents("php://input"));
 
@@ -22,25 +37,15 @@ try {
     $stmt->bindValue(':email', $data->email, PDO::PARAM_STR);
     $stmt->execute();
 
+    // Obter os dados do administrador
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
     // Verificar se o e-mail está cadastrado
-    if ($stmt->rowCount() === 0) {
+    if ($stmt->rowCount() === 0 || !password_verify($data->senha, $user['senha'])) {
         // E-mail não encontrado
         echo json_encode([
             'success' => 0,
-            'message' => 'E-mail inválido'
-        ]);
-        exit;
-    }
-
-    // Obter os dados do administrador
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Verificar a senha fornecida com a senha armazenada no banco de dados
-    if (!password_verify($data->senha, $user['senha'])) {
-        // Senha incorreta
-        echo json_encode([
-            'success' => 0,
-            'message' => 'Senha inválida'
+            'message' => 'E-mail ou senha inválido'
         ]);
         exit;
     }
@@ -60,7 +65,6 @@ try {
         'response' => $responseData
     ]);
     exit;
-
 } catch (Exception $e) {
     // Definir o código de resposta HTTP para erro interno do servidor
     http_response_code(500);
@@ -75,4 +79,3 @@ try {
     ]);
     exit;
 }
-?>

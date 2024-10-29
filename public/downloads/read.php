@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     http_response_code(405);
     $response = [
         'success' => false,
-        'message' => 'Método de requisição inválido. Apenas GET é permitido.'
+        'message' => 'Método de requisição inválido. Apenas GET e permitido.'
     ];
 }
 

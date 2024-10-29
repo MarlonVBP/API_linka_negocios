@@ -13,7 +13,7 @@ if ($method !== 'DELETE') {
     http_response_code(405);
     echo json_encode([
         'success' => 0,
-        'message' => 'Método não permitido. Apenas DELETE é aceito.',
+        'message' => 'Metodo nao permitido. Apenas DELETE e aceito.',
     ]);
     exit;
 }
