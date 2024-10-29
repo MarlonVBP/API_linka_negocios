@@ -8,8 +8,10 @@ CREATE TABLE IF NOT EXISTS admin (
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
     foto_perfil VARCHAR(255),
+    reset_token VARCHAR(255),
+    reset_expires VARCHAR(255),
     cargo VARCHAR(100),
-    ultimo_login TIMESTAMP,
+    ultimo_login TIMESTAMP NULL DEFAULT NULL,
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

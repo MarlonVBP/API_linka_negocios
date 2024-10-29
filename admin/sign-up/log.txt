@@ -175,3 +175,11 @@ stdClass Object
     [cargo] => Administrador
     [ultimo_login] => 2024-09-19T00:50:00.569Z
 )
+stdClass Object
+(
+    [email] => maria.anjos@example.com
+    [nome_admin] => maria anjos
+    [foto_perfil] => https://images.pexels.com/photos/6347963/pexels-photo-6347963.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1
+    [cargo] => Gerente de TI
+    [ultimo_login] => 2024-09-26T02:18:06.766Z
+)
