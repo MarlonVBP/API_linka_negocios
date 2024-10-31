@@ -7,54 +7,65 @@ require '../../vendor/autoload.php';
 include '../../cors.php';
 include '../../conn.php';
 
+// Decodifica os dados JSON de entrada
 $data = json_decode(file_get_contents('php://input'));
-$email = $data->email;
+$email = isset($data->email) ? filter_var($data->email, FILTER_SANITIZE_EMAIL) : null;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Validação do e-mail
-    if (!isset($email) || empty($email)) {
+    if (empty($email)) {
         echo json_encode(["error" => "O campo de e-mail é obrigatório."]);
         exit();
     }
 
+    // Verifica se o e-mail é válido
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(["error" => "E-mail inválido."]);
+        exit();
+    }
 
     // Verificar se o email existe no banco de dados
     $query = "SELECT id FROM admin WHERE email = :email";
     $stmt = $connection->prepare($query);
-    $stmt->bindValue(':email', $email); // Correção na ligação dos parâmetros
+    $stmt->bindValue(':email', $email);
     $stmt->execute();
 
     if ($stmt->rowCount() > 0) { // Verificando se o email foi encontrado
-        // Gerar um token de redefinição
+        // Gera um token de redefinição seguro
         $token = bin2hex(random_bytes(50));
         $expiry = date('Y-m-d H:i:s', strtotime('+1 hour')); // O token expira em 1 hora
 
         // Armazenar o token e o prazo de validade no banco de dados
         $updateQuery = "UPDATE admin SET reset_token = ?, reset_expires = ? WHERE email = ?";
         $updateStmt = $connection->prepare($updateQuery);
-        $updateStmt->bindValue(1, $token);
-        $updateStmt->bindValue(2, $expiry);
-        $updateStmt->bindValue(3, $email);
-        $updateStmt->execute();
+        $updateStmt->execute([$token, $expiry, $email]);
 
-        // Enviar o link de redefinição por e-mail usando PHPMailer
+        // Envia o link de redefinição por e-mail usando PHPMailer
         $reset_link = "https://linkaNegocios.digital/resetar-senha/" . $token;
-
         $mail = new PHPMailer(true);
 
         try {
             // Configurações do servidor SMTP
             $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com'; // ou outro servidor
+            $mail->Host = 'smtp.gmail.com';
             $mail->SMTPAuth = true;
-            $mail->Username = 'gestaodeferramentaspi@gmail.com'; // seu e-mail
-            $mail->Password = 'gestaodeferramentas'; // sua senha
+            $mail->Username = 'seu_email@gmail.com'; // Substitua pelo seu e-mail
+            $mail->Password = 'sua_senha_aqui'; // Substitua pela sua senha (ou idealmente use uma senha de aplicativo)
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
 
+            // Configurações SSL - Temporário para resolver problemas de conexão
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                )
+            );
+
             // Configurações do e-mail
             $mail->setFrom('no-reply@seuapp.com', 'Seu App');
-            $mail->addAddress($email); // Adicionar o destinatário
+            $mail->addAddress($email); // Destinatário
 
             // Conteúdo do e-mail
             $mail->isHTML(true);
@@ -73,4 +84,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         echo json_encode(["error" => "Usuário não encontrado!"]);
     }
+} else {
+    echo json_encode(["error" => "Método de requisição inválido."]);
 }
