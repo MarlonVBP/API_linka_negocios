@@ -40,19 +40,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $updateStmt = $connection->prepare($updateQuery);
         $updateStmt->execute([$token, $expiry, $email]);
 
-        // Envia o link de redefinição por e-mail usando PHPMailer
-        $reset_link = "https://linkaNegocios.digital/resetar-senha/" . $token;
-        $mail = new PHPMailer(true);
+        // Enviar o link de redefinição por e-mail usando PHPMailer
+        $reset_link = "http://localhost:4200/resetar-senha/" . $token;
+
+        $mail = new PHPMailer();
 
         try {
-            // Configurações do servidor SMTP
+            // Configurações do  servidor SMTP
             $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com';
+            $mail->CharSet = 'UTF-8';
+            $mail->Host = 'sandbox.smtp.mailtrap.io'; // ou outro servidor
             $mail->SMTPAuth = true;
-            $mail->Username = 'seu_email@gmail.com'; // Substitua pelo seu e-mail
-            $mail->Password = 'sua_senha_aqui'; // Substitua pela sua senha (ou idealmente use uma senha de aplicativo)
+            $mail->Username = '7064be5cebe6e3'; // seu e-mail
+            $mail->Password = '4ba026c2f3b93c'; // sua senha
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
+            $mail->Port = 2525;
 
             // Configurações SSL - Temporário para resolver problemas de conexão
             $mail->SMTPOptions = array(
@@ -64,15 +66,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             );
 
             // Configurações do e-mail
-            $mail->setFrom('no-reply@seuapp.com', 'Seu App');
-            $mail->addAddress($email); // Destinatário
+            $mail->setFrom('no-reply@linkaNegocios.com', 'LinkaNegocios');
+            $mail->addAddress($email); // Adicionar o destinatário
 
             // Conteúdo do e-mail
             $mail->isHTML(true);
             $mail->Subject = 'Redefinir sua senha';
-            $mail->Body = "Clique no link para redefinir sua senha: <a href='$reset_link'>$reset_link</a>";
-            $mail->AltBody = "Clique no link para redefinir sua senha: $reset_link";
-
+            $mail->Body = "
+<div style='font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 20px;'>
+  <div style='max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);'>
+    <div style='background-color: #221e1f; color: #ffffff; padding: 15px; text-align: center;'>
+      <h2 style='margin: 0;'>Redefinição de Senha</h2>
+    </div>
+    <div style='padding: 20px; color: #7b7b7b;'>
+      <p>Olá,</p>
+      <p>Recebemos uma solicitação para redefinir sua senha. Clique no botão abaixo para criar uma nova senha:</p>
+      <a href='$reset_link' style='display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #b22828; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 4px;'>Redefinir Senha</a>
+      <p style='font-size: 14px; color: #7b7b7b;'>Se você não solicitou esta redefinição, ignore este e-mail.</p>
+      <p style='font-size: 12px; color: #dc3545; margin-top: 20px;'>Aviso: este link é válido por apenas 1 hora após o envio deste e-mail.</p>
+    </div>
+    <div style='background-color: #f2f1ed; color: #7b7b7b; padding: 10px; text-align: center; font-size: 12px;'>
+      <p>&copy; 2024 Linka Negócios. Todos os direitos reservados.</p>
+    </div>
+  </div>
+</div>";
+            $mail->AltBody = "Clique no link para redefinir sua senha: $reset_link\n\nAviso: este link é válido por apenas 1 hora após o envio deste e-mail.";
             $mail->send();
             echo json_encode([
                 "message" => "Email de redefinição enviado!",
