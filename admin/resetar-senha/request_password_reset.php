@@ -11,56 +11,55 @@ $data = json_decode(file_get_contents('php://input'));
 $email = $data->email;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Validação do e-mail
-    if (!isset($email) || empty($email)) {
-        echo json_encode(["error" => "O campo de e-mail é obrigatório."]);
-        exit();
-    }
+  // Validação do e-mail
+  if (!isset($email) || empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo json_encode(["error" => "E-mail inválido ou campo de e-mail vazio."]);
+    exit();
+  }
 
+  // Verificar se o email existe no banco de dados
+  $query = "SELECT id FROM admin WHERE email = :email";
+  $stmt = $connection->prepare($query);
+  $stmt->bindValue(':email', $email);
+  $stmt->execute();
 
-    // Verificar se o email existe no banco de dados
-    $query = "SELECT id FROM admin WHERE email = :email";
-    $stmt = $connection->prepare($query);
-    $stmt->bindValue(':email', $email); // Correção na ligação dos parâmetros
-    $stmt->execute();
+  if ($stmt->rowCount() > 0) {
+    // Gerar um token de redefinição
+    $token = bin2hex(random_bytes(50));
+    $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-    if ($stmt->rowCount() > 0) { // Verificando se o email foi encontrado
-        // Gerar um token de redefinição
-        $token = bin2hex(random_bytes(50));
-        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour')); // O token expira em 1 hora
+    // Armazenar o token e o prazo de validade no banco de dados
+    $updateQuery = "UPDATE admin SET reset_token = ?, reset_expires = ? WHERE email = ?";
+    $updateStmt = $connection->prepare($updateQuery);
+    $updateStmt->bindValue(1, $token);
+    $updateStmt->bindValue(2, $expiry);
+    $updateStmt->bindValue(3, $email);
+    $updateStmt->execute();
 
-        // Armazenar o token e o prazo de validade no banco de dados
-        $updateQuery = "UPDATE admin SET reset_token = ?, reset_expires = ? WHERE email = ?";
-        $updateStmt = $connection->prepare($updateQuery);
-        $updateStmt->bindValue(1, $token);
-        $updateStmt->bindValue(2, $expiry);
-        $updateStmt->bindValue(3, $email);
-        $updateStmt->execute();
+    // Enviar o link de redefinição por e-mail usando PHPMailer
+    $reset_link = "https://linkanegocios.digital/resetar-senha/" . $token;
 
-        // Enviar o link de redefinição por e-mail usando PHPMailer
-        $reset_link = "http://localhost:4200/resetar-senha/" . $token;
+    $mail = new PHPMailer(true);
 
-        $mail = new PHPMailer();
+    try {
+      $mail->isSMTP();
+      $mail->CharSet = 'UTF-8';
+      $mail->Host = 'smtp-relay.brevo.com';
+      $mail->SMTPAuth = true;
+      $mail->Username = '7efcfa001@smtp-brevo.com';
+      $mail->Password = 'pzqFRB725kavVNSm';
+      $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+      $mail->Port = 587;
+        
 
-        try {
-            // Configurações do  servidor SMTP
-            $mail->isSMTP();
-            $mail->CharSet = 'UTF-8';
-            $mail->Host = 'sandbox.smtp.mailtrap.io'; // ou outro servidor
-            $mail->SMTPAuth = true;
-            $mail->Username = '7064be5cebe6e3'; // seu e-mail
-            $mail->Password = '4ba026c2f3b93c'; // sua senha
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 2525;
+      // Configurações do e-mail
+      $mail->setFrom('marlonvicctor13@gmail.com', 'LinkaNegocios');
+      $mail->addAddress($email);
 
-            // Configurações do e-mail
-            $mail->setFrom('no-reply@linkaNegocios.com', 'LinkaNegocios');
-            $mail->addAddress($email); // Adicionar o destinatário
-
-            // Conteúdo do e-mail
-            $mail->isHTML(true);
-            $mail->Subject = 'Redefinir sua senha';
-            $mail->Body = "
+      // Conteúdo do e-mail
+      $mail->isHTML(true);
+      $mail->Subject = 'Redefinir sua senha';
+      $mail->Body = "
 <div style='font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 20px;'>
   <div style='max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);'>
     <div style='background-color: #221e1f; color: #ffffff; padding: 15px; text-align: center;'>
@@ -78,16 +77,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
   </div>
 </div>";
-            $mail->AltBody = "Clique no link para redefinir sua senha: $reset_link\n\nAviso: este link é válido por apenas 1 hora após o envio deste e-mail.";
-            $mail->send();
-            echo json_encode([
-                "message" => "Email de redefinição enviado!",
-                "token" => $token
-            ]);
-        } catch (Exception $e) {
-            echo json_encode(["error" => "Erro ao enviar o e-mail: {$mail->ErrorInfo}"]);
-        }
-    } else {
-        echo json_encode(["error" => "Usuário não encontrado!"]);
+      $mail->AltBody = "Clique no link para redefinir sua senha: $reset_link\n\nAviso: este link é válido por apenas 1 hora após o envio deste e-mail.";
+      $mail->send();
+      echo json_encode([
+        "message" => "Email de redefinição enviado!",
+        "token" => $token
+      ]);
+    } catch (Exception $e) {
+      echo json_encode(["error" => "Erro ao enviar o e-mail: {$mail->ErrorInfo}"]);
     }
+  } else {
+    echo json_encode(["error" => "Usuário não encontrado!"]);
+  }
 }
