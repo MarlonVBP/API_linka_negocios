@@ -12,7 +12,7 @@ $data = json_decode(file_get_contents('php://input'));
 $email = isset($data->email) ? filter_var($data->email, FILTER_SANITIZE_EMAIL) : null;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Validação do e-mail
+    // Validação do e-mai
     if (empty($email)) {
         echo json_encode(["error" => "O campo de e-mail é obrigatório."]);
         exit();
@@ -74,23 +74,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $mail->isHTML(true);
             $mail->Subject = 'Redefinir sua senha';
             $mail->Body = "
-<div style='font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 20px;'>
-  <div style='max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);'>
-    <div style='background-color: #221e1f; color: #ffffff; padding: 15px; text-align: center;'>
-      <h2 style='margin: 0;'>Redefinição de Senha</h2>
-    </div>
-    <div style='padding: 20px; color: #7b7b7b;'>
-      <p>Olá,</p>
-      <p>Recebemos uma solicitação para redefinir sua senha. Clique no botão abaixo para criar uma nova senha:</p>
-      <a href='$reset_link' style='display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #b22828; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 4px;'>Redefinir Senha</a>
-      <p style='font-size: 14px; color: #7b7b7b;'>Se você não solicitou esta redefinição, ignore este e-mail.</p>
-      <p style='font-size: 12px; color: #dc3545; margin-top: 20px;'>Aviso: este link é válido por apenas 1 hora após o envio deste e-mail.</p>
-    </div>
-    <div style='background-color: #f2f1ed; color: #7b7b7b; padding: 10px; text-align: center; font-size: 12px;'>
-      <p>&copy; 2024 Linka Negócios. Todos os direitos reservados.</p>
-    </div>
-  </div>
-</div>";
+                    <div style='font-family: Arial, sans-serif; background-color: #f6f6f6; padding: 20px;'>
+                      <div style='max-width: 600px; margin: auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);'>
+                        <div style='background-color: #221e1f; color: #ffffff; padding: 15px; text-align: center;'>
+                          <h2 style='margin: 0;'>Redefinição de Senha</h2>
+                        </div>
+                        <div style='padding: 20px; color: #7b7b7b;'>
+                          <p>Olá,</p>
+                          <p>Recebemos uma solicitação para redefinir sua senha. Clique no botão abaixo para criar uma nova senha:</p>
+                          <a href='$reset_link' style='display: inline-block; margin: 20px 0; padding: 10px 20px; background-color: #b22828; color: #ffffff; text-decoration: none; font-weight: bold; border-radius: 4px;'>Redefinir Senha</a>
+                          <p style='font-size: 14px; color: #7b7b7b;'>Se você não solicitou esta redefinição, ignore este e-mail.</p>
+                          <p style='font-size: 12px; color: #dc3545; margin-top: 20px;'>Aviso: este link é válido por apenas 1 hora após o envio deste e-mail.</p>
+                        </div>
+                        <div style='background-color: #f2f1ed; color: #7b7b7b; padding: 10px; text-align: center; font-size: 12px;'>
+                          <p>&copy; 2024 Linka Negócios. Todos os direitos reservados.</p>
+                        </div>
+                      </div>
+                    </div>";
       $mail->AltBody = "Clique no link para redefinir sua senha: $reset_link\n\nAviso: este link é válido por apenas 1 hora após o envio deste e-mail.";
       $mail->send();
       echo json_encode([
@@ -102,4 +102,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 } else {
     echo json_encode(["error" => "Método de requisição inválido."]);
+}
 }

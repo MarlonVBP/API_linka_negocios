@@ -9,7 +9,7 @@ date_default_timezone_set('America/Sao_Paulo');
 // $senha = 'L!nK@H0sT_N$g-';
 
 $host = "localhost";
-$database = "LinkNegocios";
+$database = "linknegocios";
 $usuario = "root";
 $senha = '';
 
