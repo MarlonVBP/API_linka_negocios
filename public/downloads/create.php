@@ -1,164 +1,161 @@
 <?php
-include '../../cors.php';  
-include '../../conn.php';  
+// Desativa a exibição de erros no corpo da resposta para não quebrar o JSON no front-end
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
 
-$method = $_SERVER['REQUEST_METHOD'];
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Max-Age: 3600");
+header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-if ($method === 'OPTIONS') {
-    exit;
+include_once '../../conn.php';
+
+function sanitize_input($data)
+{
+    return htmlspecialchars(strip_tags($data ?? ''));
 }
 
-if ($method !== 'POST') {
-    http_response_code(405);
-    echo json_encode([
-        'success' => 0,
-        'message' => 'Metodo nao permitido. Apenas POST e permitido.',
-    ]);
-    exit;
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-$data = json_decode(file_get_contents("php://input"));
-
-if (json_last_error() !== JSON_ERROR_NONE) {
-    http_response_code(400);
-    echo json_encode([
-        'success' => 0,
-        'message' => 'JSON inválido.',
-    ]);
-    exit;
-}
-
-$titulo_breve = htmlspecialchars(trim($data->titulo_breve ?? ''));
-$detalhes_problema_beneficios = htmlspecialchars(trim($data->detalhes_problema_beneficios ?? ''));
-$destaque_problemas = htmlspecialchars(trim($data->destaque_problemas ?? ''));
-$destaque_beneficio1 = htmlspecialchars(trim($data->destaque_beneficio1 ?? ''));
-$destaque_beneficio2 = htmlspecialchars(trim($data->destaque_beneficio2 ?? ''));
-$destaque_beneficio3 = htmlspecialchars(trim($data->destaque_beneficio3 ?? ''));
-$cta = htmlspecialchars(trim($data->cta ?? ''));
-$imagem_placeholder = htmlspecialchars(trim($data->imagem_placeholder ?? ''));
-$beneficio1 = htmlspecialchars(trim($data->beneficio1 ?? ''));
-$problema_beneficio1 = htmlspecialchars(trim($data->problema_beneficio1 ?? ''));
-$beneficio2 = htmlspecialchars(trim($data->beneficio2 ?? ''));
-$problema_beneficio2 = htmlspecialchars(trim($data->problema_beneficio2 ?? ''));
-$beneficio3 = htmlspecialchars(trim($data->beneficio3 ?? ''));
-$problema_beneficio3 = htmlspecialchars(trim($data->problema_beneficio3 ?? ''));
-$porque_clicar = htmlspecialchars(trim($data->porque_clicar ?? ''));
-
-$pergunta1 = htmlspecialchars(trim($data->pergunta1 ?? ''));
-$resposta1 = htmlspecialchars(trim($data->resposta1 ?? ''));
-$pergunta2 = htmlspecialchars(trim($data->pergunta2 ?? ''));
-$resposta2 = htmlspecialchars(trim($data->resposta2 ?? ''));
-$pergunta3 = htmlspecialchars(trim($data->pergunta3 ?? ''));
-$resposta3 = htmlspecialchars(trim($data->resposta3 ?? ''));
-$pergunta4 = htmlspecialchars(trim($data->pergunta4 ?? ''));
-$resposta4 = htmlspecialchars(trim($data->resposta4 ?? ''));
-$pergunta5 = htmlspecialchars(trim($data->pergunta5 ?? ''));
-$resposta5 = htmlspecialchars(trim($data->resposta5 ?? ''));
-
-$query = "INSERT INTO `ProdutoDivulgacao` (
-    titulo_breve,
-    detalhes_problema_beneficios,
-    destaque_problemas,
-    destaque_beneficio1,
-    destaque_beneficio2,
-    destaque_beneficio3,
-    cta,
-    imagem_placeholder,
-    beneficio1,
-    problema_beneficio1,
-    beneficio2,
-    problema_beneficio2,
-    beneficio3,
-    problema_beneficio3,
-    porque_clicar,
-    pergunta1,
-    resposta1,
-    pergunta2,
-    resposta2,
-    pergunta3,
-    resposta3,
-    pergunta4,
-    resposta4,
-    pergunta5,
-    resposta5
-) VALUES (
-    :titulo_breve,
-    :detalhes_problema_beneficios,
-    :destaque_problemas,
-    :destaque_beneficio1,
-    :destaque_beneficio2,
-    :destaque_beneficio3,
-    :cta,
-    :imagem_placeholder,
-    :beneficio1,
-    :problema_beneficio1,
-    :beneficio2,
-    :problema_beneficio2,
-    :beneficio3,
-    :problema_beneficio3,
-    :porque_clicar,
-    :pergunta1,
-    :resposta1,
-    :pergunta2,
-    :resposta2,
-    :pergunta3,
-    :resposta3,
-    :pergunta4,
-    :resposta4,
-    :pergunta5,
-    :resposta5
-)";
-
-try {
-    $stmt = $connection->prepare($query);
-
-    $stmt->bindValue(':titulo_breve', $titulo_breve, PDO::PARAM_STR);
-    $stmt->bindValue(':detalhes_problema_beneficios', $detalhes_problema_beneficios, PDO::PARAM_STR);
-    $stmt->bindValue(':destaque_problemas', $destaque_problemas, PDO::PARAM_STR);
-    $stmt->bindValue(':destaque_beneficio1', $destaque_beneficio1, PDO::PARAM_STR);
-    $stmt->bindValue(':destaque_beneficio2', $destaque_beneficio2, PDO::PARAM_STR);
-    $stmt->bindValue(':destaque_beneficio3', $destaque_beneficio3, PDO::PARAM_STR);
-    $stmt->bindValue(':cta', $cta, PDO::PARAM_STR);
-    $stmt->bindValue(':imagem_placeholder', $imagem_placeholder, PDO::PARAM_STR);
-    $stmt->bindValue(':beneficio1', $beneficio1, PDO::PARAM_STR);
-    $stmt->bindValue(':problema_beneficio1', $problema_beneficio1, PDO::PARAM_STR);
-    $stmt->bindValue(':beneficio2', $beneficio2, PDO::PARAM_STR);
-    $stmt->bindValue(':problema_beneficio2', $problema_beneficio2, PDO::PARAM_STR);
-    $stmt->bindValue(':beneficio3', $beneficio3, PDO::PARAM_STR);
-    $stmt->bindValue(':problema_beneficio3', $problema_beneficio3, PDO::PARAM_STR);
-    $stmt->bindValue(':porque_clicar', $porque_clicar, PDO::PARAM_STR);
-    $stmt->bindValue(':pergunta1', $pergunta1, PDO::PARAM_STR);
-    $stmt->bindValue(':resposta1', $resposta1, PDO::PARAM_STR);
-    $stmt->bindValue(':pergunta2', $pergunta2, PDO::PARAM_STR);
-    $stmt->bindValue(':resposta2', $resposta2, PDO::PARAM_STR);
-    $stmt->bindValue(':pergunta3', $pergunta3, PDO::PARAM_STR);
-    $stmt->bindValue(':resposta3', $resposta3, PDO::PARAM_STR);
-    $stmt->bindValue(':pergunta4', $pergunta4, PDO::PARAM_STR);
-    $stmt->bindValue(':resposta4', $resposta4, PDO::PARAM_STR);
-    $stmt->bindValue(':pergunta5', $pergunta5, PDO::PARAM_STR);
-    $stmt->bindValue(':resposta5', $resposta5, PDO::PARAM_STR);
-
-    if ($stmt->execute()) {
-        http_response_code(201);
-        echo json_encode([
-            'success' => 1,
-            'message' => 'Dados inseridos com sucesso'
-        ]);
+    // Validar campos obrigatórios
+    if (empty($_POST['titulo_breve']) || empty($_POST['detalhes_problema_beneficios'])) {
+        http_response_code(400);
+        echo json_encode(["message" => "Dados incompletos. Título e Detalhes são obrigatórios."]);
         exit;
     }
 
-    echo json_encode([
-        'success' => 0,
-        'message' => 'Falha na inserção dos dados'
-    ]);
-    exit;
+    try {
+        // Recebe e sanitiza os dados
+        $titulo_breve = sanitize_input($_POST['titulo_breve']);
+        $detalhes_problema_beneficios = sanitize_input($_POST['detalhes_problema_beneficios']);
+        $destaque_problemas = sanitize_input($_POST['destaque_problemas'] ?? '');
+        $destaque_beneficio1 = sanitize_input($_POST['destaque_beneficio1'] ?? '');
+        $destaque_beneficio2 = sanitize_input($_POST['destaque_beneficio2'] ?? '');
+        $destaque_beneficio3 = sanitize_input($_POST['destaque_beneficio3'] ?? '');
+        $cta = sanitize_input($_POST['cta'] ?? '');
+        $imagem_placeholder = sanitize_input($_POST['imagem_placeholder'] ?? '');
+        $problema_beneficio1 = sanitize_input($_POST['problema_beneficio1'] ?? '');
+        $problema_beneficio2 = sanitize_input($_POST['problema_beneficio2'] ?? '');
+        $problema_beneficio3 = sanitize_input($_POST['problema_beneficio3'] ?? '');
+        $porque_clicar = sanitize_input($_POST['porque_clicar'] ?? '');
 
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => 0,
-        'message' => 'Erro no servidor: ' . $e->getMessage()
-    ]);
-    exit;
+        $pergunta1 = sanitize_input($_POST['pergunta1'] ?? '');
+        $resposta1 = sanitize_input($_POST['resposta1'] ?? '');
+        $pergunta2 = sanitize_input($_POST['pergunta2'] ?? '');
+        $resposta2 = sanitize_input($_POST['resposta2'] ?? '');
+        $pergunta3 = sanitize_input($_POST['pergunta3'] ?? '');
+        $resposta3 = sanitize_input($_POST['resposta3'] ?? '');
+        $pergunta4 = sanitize_input($_POST['pergunta4'] ?? '');
+        $resposta4 = sanitize_input($_POST['resposta4'] ?? '');
+        $pergunta5 = sanitize_input($_POST['pergunta5'] ?? '');
+        $resposta5 = sanitize_input($_POST['resposta5'] ?? '');
+
+        // Upload do Arquivo ZIP
+        $arquivo_zip_path = null;
+
+        if (isset($_FILES['arquivo_zip']) && $_FILES['arquivo_zip']['error'] === UPLOAD_ERR_OK) {
+            $fileName = $_FILES['arquivo_zip']['name'];
+            $fileTmpPath = $_FILES['arquivo_zip']['tmp_name'];
+
+            // Pega a extensão de forma segura
+            $fileNameCmps = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameCmps));
+
+            if ($fileExtension === 'zip') {
+                $uploadFileDir = '../../uploads/produtos_zips/';
+
+                // Cria diretório se não existir
+                if (!is_dir($uploadFileDir)) {
+                    if (!mkdir($uploadFileDir, 0777, true)) {
+                        throw new Exception("Falha ao criar diretório de upload. Verifique as permissões.");
+                    }
+                }
+
+                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+                $dest_path = $uploadFileDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                    // Caminho para salvar no banco (relativo ou absoluto conforme sua necessidade)
+                    $arquivo_zip_path = 'uploads/produtos_zips/' . $newFileName;
+                } else {
+                    throw new Exception("Erro ao mover o arquivo para o destino final.");
+                }
+            } else {
+                http_response_code(400);
+                echo json_encode(["message" => "Apenas arquivos .zip são permitidos."]);
+                exit;
+            }
+        }
+
+        // Query
+        $query = "INSERT INTO ProdutoDivulgacao SET 
+            titulo_breve = :titulo_breve,
+            detalhes_problema_beneficios = :detalhes_problema_beneficios,
+            destaque_problemas = :destaque_problemas,
+            destaque_beneficio1 = :destaque_beneficio1,
+            destaque_beneficio2 = :destaque_beneficio2,
+            destaque_beneficio3 = :destaque_beneficio3,
+            cta = :cta,
+            imagem_placeholder = :imagem_placeholder,
+            arquivo_zip = :arquivo_zip,
+            problema_beneficio1 = :problema_beneficio1,
+            problema_beneficio2 = :problema_beneficio2,
+            problema_beneficio3 = :problema_beneficio3,
+            porque_clicar = :porque_clicar,
+            pergunta1 = :pergunta1,
+            resposta1 = :resposta1,
+            pergunta2 = :pergunta2,
+            resposta2 = :resposta2,
+            pergunta3 = :pergunta3,
+            resposta3 = :resposta3,
+            pergunta4 = :pergunta4,
+            resposta4 = :resposta4,
+            pergunta5 = :pergunta5,
+            resposta5 = :resposta5";
+
+        // CORREÇÃO AQUI: Usando $connection em vez de $conn
+        $stmt = $connection->prepare($query);
+
+        $stmt->bindParam(':titulo_breve', $titulo_breve);
+        $stmt->bindParam(':detalhes_problema_beneficios', $detalhes_problema_beneficios);
+        $stmt->bindParam(':destaque_problemas', $destaque_problemas);
+        $stmt->bindParam(':destaque_beneficio1', $destaque_beneficio1);
+        $stmt->bindParam(':destaque_beneficio2', $destaque_beneficio2);
+        $stmt->bindParam(':destaque_beneficio3', $destaque_beneficio3);
+        $stmt->bindParam(':cta', $cta);
+        $stmt->bindParam(':imagem_placeholder', $imagem_placeholder);
+        $stmt->bindParam(':arquivo_zip', $arquivo_zip_path);
+        $stmt->bindParam(':problema_beneficio1', $problema_beneficio1);
+        $stmt->bindParam(':problema_beneficio2', $problema_beneficio2);
+        $stmt->bindParam(':problema_beneficio3', $problema_beneficio3);
+        $stmt->bindParam(':porque_clicar', $porque_clicar);
+        $stmt->bindParam(':pergunta1', $pergunta1);
+        $stmt->bindParam(':resposta1', $resposta1);
+        $stmt->bindParam(':pergunta2', $pergunta2);
+        $stmt->bindParam(':resposta2', $resposta2);
+        $stmt->bindParam(':pergunta3', $pergunta3);
+        $stmt->bindParam(':resposta3', $resposta3);
+        $stmt->bindParam(':pergunta4', $pergunta4);
+        $stmt->bindParam(':resposta4', $resposta4);
+        $stmt->bindParam(':pergunta5', $pergunta5);
+        $stmt->bindParam(':resposta5', $resposta5);
+
+        if ($stmt->execute()) {
+            http_response_code(201);
+            // CORREÇÃO AQUI: Usando $connection em vez de $conn
+            echo json_encode(["message" => "Produto criado com sucesso.", "id" => $connection->lastInsertId()]);
+        } else {
+            throw new Exception("Erro ao executar a query: " . implode(" | ", $stmt->errorInfo()));
+        }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            "message" => "Erro interno no servidor.",
+            "error" => $e->getMessage()
+        ]);
+    }
+} else {
+    http_response_code(405);
+    echo json_encode(["message" => "Método não permitido."]);
 }
-?>
