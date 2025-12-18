@@ -1,13 +1,27 @@
 <?php
+
+
 include '../../cors.php';
 include '../../conn.php';
+require_once '../../admin/login/jwtEhValido.php';
+
+header('Content-Type: application/json');
 
 $response = [
     'success' => false,
     'message' => 'Método de requisição inválido'
 ];
 
+$token = $_COOKIE['auth_token'] ?? null;
+
+if (!$token || !jwt_eh_valido($token)) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
+
     $data = json_decode(file_get_contents("php://input"), true);
 
     if (isset($data['id']) && is_numeric($data['id'])) {
@@ -39,5 +53,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
     }
 }
 
-header('Content-Type: application/json');
 echo json_encode($response);

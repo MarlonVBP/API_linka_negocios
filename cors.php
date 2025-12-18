@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 // Lista de origens permitidas (ajuste conforme necessário)
 $allowedOrigins = [
-    'https://linkanegocios.digital',
+    'https://linkanegocios.com.br',
     'http://localhost:4200'  // remover depois
 ];
 
@@ -16,6 +16,8 @@ if (in_array($origin, $allowedOrigins)) {
 } else {
     header("Access-Control-Allow-Origin: none");
 }
+
+header("Access-Control-Allow-Credentials: true");
 
 // Permite que os métodos HTTP GET, POST, PUT e DELETE sejam usados a partir de origens diferentes
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");

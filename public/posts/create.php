@@ -1,31 +1,76 @@
 <?php
+
 include '../../cors.php';
 include '../../conn.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = $_POST['email'];
+require_once '../../admin/login/jwtEhValido.php';
 
-    $sql = "SELECT id FROM admin WHERE email=:email";
-    $stmt = $connection->prepare($sql);
-    $stmt->bindValue(':email', $email, PDO::PARAM_STR);
-    $stmt->execute();
+header('Content-Type: application/json');
 
-    if ($stmt->rowCount() > 0) {
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        $usuario_id = $user['id'];
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Método não permitido']);
+    exit;
+}
 
-        if (isset($_POST['title']) && isset($_POST['content']) && isset($_FILES['image']) && isset($_POST['category_id'])) {
-            $title = trim($_POST['title']);
-            $content = trim($_POST['content']);
-            $description = trim($_POST['description']);
-            $category_id = intval($_POST['category_id']);
+$token = $_COOKIE['auth_token'] ?? null;
 
-            if ($_FILES['image']['error'] == UPLOAD_ERR_OK) {
-                $image = $_FILES['image']['name'];
-                $target_dir = "imagens/";
-                $target_file = $target_dir . basename($image);
+if (!$token || !jwt_eh_valido($token)) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Acesso negado. Sessão expirada ou inválida.']);
+    exit;
+}
 
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+$tokenParts = explode('.', $token);
+$payload = json_decode(base64url_decode($tokenParts[1]));
+$usuario_id = $payload->ID_USER ?? null; // Certifique-se que no seu criarJwt.php a chave é 'ID_USER' mesmo
+
+if (!$usuario_id) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Token inválido: Usuário não identificado.']);
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Método não permitido']);
+    exit;
+}
+
+if (isset($_POST['title']) && isset($_POST['content']) && isset($_POST['category_id'])) {
+
+    $title = trim($_POST['title']);
+    $content = trim($_POST['content']);
+    $description = isset($_POST['description']) ? trim($_POST['description']) : '';
+    $category_id = intval($_POST['category_id']);
+
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+
+        $fileTmpPath = $_FILES['image']['tmp_name'];
+        $fileNameOriginal = $_FILES['image']['name'];
+        $fileSize = $_FILES['image']['size'];
+
+        $fileNameCmps = explode(".", $fileNameOriginal);
+        $fileExtension = strtolower(end($fileNameCmps));
+        $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg', 'webp');
+
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $fileMimeType = $finfo->file($fileTmpPath);
+        $allowedMimeTypes = array('image/jpeg', 'image/png', 'image/gif', 'image/webp');
+
+        if (in_array($fileExtension, $allowedfileExtensions) && in_array($fileMimeType, $allowedMimeTypes)) {
+
+            $newFileName = md5(time() . $fileNameOriginal) . '.' . $fileExtension;
+            $uploadFileDir = 'imagens/';
+            $dest_path = $uploadFileDir . $newFileName;
+
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0755, true);
+            }
+
+            if (move_uploaded_file($fileTmpPath, $dest_path)) {
+
+                try {
                     $query = "INSERT INTO postagens (usuario_id, categoria_id, titulo, conteudo, descricao, url_imagem) VALUES (:usuario_id, :categoria_id, :titulo, :conteudo, :descricao, :url_imagem)";
                     $stmt = $connection->prepare($query);
 
@@ -34,54 +79,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $stmt->bindValue(':titulo', $title, PDO::PARAM_STR);
                     $stmt->bindValue(':conteudo', $content, PDO::PARAM_STR);
                     $stmt->bindValue(':descricao', $description, PDO::PARAM_STR);
-                    $stmt->bindValue(':url_imagem', $target_file, PDO::PARAM_STR);
+                    $stmt->bindValue(':url_imagem', $dest_path, PDO::PARAM_STR);
 
                     if ($stmt->execute()) {
-                        $response = [
+                        echo json_encode([
                             'success' => true,
                             'message' => 'Postagem criada com sucesso',
                             'data' => [
                                 'id' => $connection->lastInsertId(),
                                 'title' => $title,
-                                'content' => $content,
-                                'image' => $target_file
+                                'image' => $dest_path
                             ]
-                        ];
+                        ]);
                     } else {
-                        $response = [
-                            'success' => false,
-                            'message' => 'Falha na criação da postagem'
-                        ];
+                        throw new Exception("Erro ao inserir no banco.");
                     }
-                } else {
-                    $response = [
-                        'success' => false,
-                        'message' => 'Erro ao fazer o upload da imagem'
-                    ];
+                } catch (Exception $e) {
+                    http_response_code(500);
+                    echo json_encode(['success' => false, 'message' => 'Erro interno: ' . $e->getMessage()]);
                 }
             } else {
-                $response = [
-                    'success' => false,
-                    'message' => 'Arquivo de imagem não fornecido ou erro no upload'
-                ];
+                http_response_code(500);
+                echo json_encode(['success' => false, 'message' => 'Erro ao mover o arquivo para o diretório de imagens.']);
             }
         } else {
-            $response = [
-                'success' => false,
-                'message' => 'Campos obrigatórios não fornecidos'
-            ];
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Tipo de arquivo inválido. Apenas imagens (JPG, PNG, WEBP) são permitidas.']);
         }
     } else {
-        $response = [
-            'success' => false,
-            'message' => 'Usuário não encontrado'
-        ];
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Imagem obrigatória ou erro no envio.']);
     }
 } else {
-    $response = [
-        'success' => false,
-        'message' => 'Método de requisição inválido'
-    ];
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Dados incompletos (Título, Conteúdo e Categoria são obrigatórios).']);
 }
-header('Content-Type: application/json');
-echo json_encode($response);

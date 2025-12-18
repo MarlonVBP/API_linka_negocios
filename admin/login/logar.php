@@ -39,7 +39,7 @@ try {
 
     // Obter os dados do administrador
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     // Verificar se o e-mail está cadastrado
     if ($stmt->rowCount() === 0 || !password_verify($data->senha, $user['senha'])) {
         // E-mail não encontrado
@@ -53,13 +53,25 @@ try {
     // Se as credenciais forem válidas, criar o token JWT
     $token = criar_jwt($user['id'], $data->email, $data->senha);
 
-    $responseData = [
-        'token' => $token,
-        'nome' => $user['nome_admin'],
-        'email' => $data->email // Adiciona o e-mail à resposta
+    $cookieParams = [
+        'expires' => time() + (60 * 60 * 24), // 1 dia
+        'path' => '/', // Valido para todo o site
+        'domain' => '', // Automático (ou defina se necessário para subdomínios)
+        'secure' => true, // OBRIGATÓRIO: Só envia se for HTTPS
+        'httponly' => true, // OBRIGATÓRIO: JS não acessa
+        'samesite' => 'Strict' // Proteção contra CSRF (Use 'Lax' se 'Strict' bloquear navegação externa)
     ];
 
-    // Enviar a resposta com o token JWT
+    // Define o cookie
+    setcookie('auth_token', $token, $cookieParams);
+
+    // Retorna APENAS dados públicos do usuário, SEM O TOKEN
+    $responseData = [
+        // 'token' => $token, // REMOVIDO: Não enviamos mais o token no corpo
+        'nome' => $user['nome_admin'],
+        'email' => $data->email
+    ];
+
     echo json_encode([
         'success' => 1,
         'response' => $responseData

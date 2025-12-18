@@ -3,24 +3,19 @@ include '../../cors.php';
 include '../../conn.php';
 include 'jwtEhValido.php';
 
-// Obter os dados JSON do corpo da solicitação
-$data = json_decode(file_get_contents("php://input"));
-
 try {
-    // Verificar se o token está presente e é uma string
-    if (!isset($data->token) || !is_string($data->token) || empty($data->token)) {
+    if (!isset($_COOKIE['auth_token']) || empty($_COOKIE['auth_token'])) {
         echo json_encode([
             'success' => 0,
-            'message' => 'Token não encontrado ou inválido. Acesso negado.'
+            'message' => 'Token não encontrado (Cookie ausente).'
         ]);
         exit;
     }
+    $tokenString = $_COOKIE['auth_token'];
 
-    // Verificar se o token JWT é válido
-    $token = jwt_eh_valido($data->token);
+    $tokenValido = jwt_eh_valido($tokenString);
 
-    if ($token) {
-        // Se o token for válido, enviar resposta de sucesso
+    if ($tokenValido) {
         echo json_encode([
             'success' => 1,
             'message' => 'Acesso permitido.'
@@ -28,20 +23,18 @@ try {
         exit;
     }
 
-    // Se o token não for válido, enviar resposta de acesso negado
+    setcookie('auth_token', '', ['expires' => time() - 3600, 'path' => '/']);
+
     echo json_encode([
         'success' => 0,
-        'message' => 'Token inválido. Acesso negado.'
+        'message' => 'Token inválido ou expirado.'
     ]);
     exit;
 } catch (Exception $e) {
-    // Definir o código de resposta HTTP para erro interno do servidor
     http_response_code(500);
-
-    // Enviar resposta com mensagem de erro
     echo json_encode([
         'success' => 0,
-        'message' => 'Ocorreu um erro. Tente novamente mais tarde.'
+        'message' => 'Erro interno ao validar token.'
     ]);
     exit;
 }
