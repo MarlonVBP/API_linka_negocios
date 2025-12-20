@@ -2,6 +2,8 @@
 include '../../cors.php';
 include '../../conn.php';
 
+require_once '../../admin/login/jwtEhValido.php';
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'OPTIONS') {
@@ -14,6 +16,22 @@ if ($method !== 'PUT') {
         'success' => 0,
         'message' => 'Metodo nao permitido. Apenas PUT e aceito.',
     ]);
+    exit;
+}
+
+$token = $_COOKIE['auth_token'] ?? null;
+
+if (!$token || !jwt_eh_valido($token)) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Acesso negado. Sessão expirada ou inválida.']);
+    exit;
+}
+
+$tokenParts = explode('.', $token);
+$payload = json_decode(base64url_decode($tokenParts[1]));
+if (!isset($payload->ID_USER)) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Token inválido.']);
     exit;
 }
 
@@ -35,6 +53,7 @@ try {
     $select_stmt->execute();
 
     if ($select_stmt->rowCount() > 0) {
+
         $titulo_breve = isset($data->titulo_breve) ? htmlspecialchars(trim($data->titulo_breve)) : null;
         $detalhes_problema_beneficios = isset($data->detalhes_problema_beneficios) ? htmlspecialchars(trim($data->detalhes_problema_beneficios)) : null;
         $destaque_problemas = isset($data->destaque_problemas) ? htmlspecialchars(trim($data->destaque_problemas)) : null;
@@ -110,7 +129,7 @@ try {
         $update_stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
         if ($update_stmt->execute()) {
-            http_response_code(200); 
+            http_response_code(200);
             echo json_encode([
                 'success' => 1,
                 'message' => 'Dados atualizados com sucesso.'
@@ -134,4 +153,3 @@ try {
         'message' => 'Erro no servidor: ' . $e->getMessage()
     ]);
 }
-?>
