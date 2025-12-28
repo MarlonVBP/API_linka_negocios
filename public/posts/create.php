@@ -23,7 +23,70 @@ if (!$token || !jwt_eh_valido($token)) {
 
 $tokenParts = explode('.', $token);
 $payload = json_decode(base64url_decode($tokenParts[1]));
-$usuario_id = $payload->ID_USER ?? null; // Certifique-se que no seu criarJwt.php a chave é 'ID_USER' mesmo
+$usuario_id = $payload->ID_USER ?? null;
+
+function processarImagensDoConteudo($htmlContent)
+{
+    if (empty($htmlContent)) return $htmlContent;
+
+    $dom = new DOMDocument();
+
+    libxml_use_internal_errors(true);
+    $dom->loadHTML(mb_convert_encoding($htmlContent, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+
+    $images = $dom->getElementsByTagName('img');
+    $alterou = false;
+
+    foreach ($images as $img) {
+        $src = $img->getAttribute('src');
+
+
+        if (preg_match('/^data:image\/(\w+);base64,/', $src, $type)) {
+            $data = substr($src, strpos($src, ',') + 1);
+            $type = strtolower($type[1]);
+
+
+            if (!in_array($type, ['jpg', 'jpeg', 'gif', 'png', 'webp'])) {
+                continue;
+            }
+
+            $data = base64_decode($data);
+
+            if ($data === false) {
+                continue;
+            }
+
+
+            $fileName = uniqid() . '_' . time() . '.' . $type;
+
+
+
+            $diretorioDestino = 'imagens/';
+
+            if (!is_dir($diretorioDestino)) {
+                mkdir($diretorioDestino, 0755, true);
+            }
+
+            file_put_contents($diretorioDestino . $fileName, $data);
+
+
+
+            $webUrl = 'https://linkanegocios.com.br/api/public/posts/imagens/' . $fileName;
+
+
+            $img->setAttribute('src', $webUrl);
+            $img->setAttribute('class', 'img-fluid post-image');
+            $alterou = true;
+        }
+    }
+
+    if ($alterou) {
+        return $dom->saveHTML();
+    }
+
+    return $htmlContent;
+}
 
 if (!$usuario_id) {
     http_response_code(403);
@@ -37,12 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-if (isset($_POST['title']) && isset($_POST['content']) && isset($_POST['category_id'])) {
+if (isset($_POST['title']) && isset($_POST['content']) && isset($_POST['category'])) {
 
     $title = trim($_POST['title']);
-    $content = trim($_POST['content']);
+    $contentRaw = trim($_POST['content']);
+    $content = processarImagensDoConteudo($contentRaw);
     $description = isset($_POST['description']) ? trim($_POST['description']) : '';
-    $category_id = intval($_POST['category_id']);
+    $category_id = intval($_POST['category']);
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
 

@@ -22,27 +22,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 			$insetStmt->bindParam(':dados', $dados, PDO::PARAM_INT);
 			$insetStmt->execute();
 
-			$query = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, u.nome_admin as usuario_nome, c.nome as categoria_nome 
+			$query = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.views, p.criado_em, 
+                             u.nome_admin as usuario_nome, 
+                             c.nome as categoria_nome,
+                             GROUP_CONCAT(DISTINCT t.nome) as tags
                       FROM postagens p 
                       JOIN admin u ON p.usuario_id = u.id 
                       JOIN categorias c ON p.categoria_id = c.id 
-                      WHERE p.id = :id";
+                      LEFT JOIN postagem_tags pt ON p.id = pt.postagem_id
+                      LEFT JOIN tags t ON pt.tag_id = t.id
+                      WHERE p.id = :id
+                      GROUP BY p.id";
+
 			$stmt = $connection->prepare($query);
 			$stmt->bindParam(':id', $id, PDO::PARAM_INT);
 			$stmt->execute();
 			$postagensRecente = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		} else {
 			$query2 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, p.comentarios,
-			u.nome_admin as usuario_nome, 
-			c.nome as categoria_nome,
-			COUNT(cmt.id) as numero_comentarios
-FROM postagens p 
-JOIN admin u ON p.usuario_id = u.id 
-JOIN categorias c ON p.categoria_id = c.id
-LEFT JOIN comentarios_postagens cmt ON p.id = cmt.postagem_id
-GROUP BY p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, u.nome_admin, c.nome
-ORDER BY p.views DESC, p.criado_em ASC
-LIMIT 1";
+                              u.nome_admin as usuario_nome, 
+                              c.nome as categoria_nome,
+                              COUNT(DISTINCT cmt.id) as numero_comentarios,
+                              GROUP_CONCAT(DISTINCT t.nome) as tags
+                       FROM postagens p 
+                       JOIN admin u ON p.usuario_id = u.id 
+                       JOIN categorias c ON p.categoria_id = c.id
+                       LEFT JOIN comentarios_postagens cmt ON p.id = cmt.postagem_id
+                       LEFT JOIN postagem_tags pt ON p.id = pt.postagem_id
+                       LEFT JOIN tags t ON pt.tag_id = t.id
+                       GROUP BY p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, u.nome_admin, c.nome
+                       ORDER BY p.views DESC, p.criado_em ASC
+                       LIMIT 1";
+
 			$stmt2 = $connection->prepare($query2);
 			$stmt2->execute();
 			$postagensMaisVisto = $stmt2->fetch(PDO::FETCH_ASSOC);
@@ -51,16 +62,19 @@ LIMIT 1";
 				$idMaisVisto = $postagensMaisVisto['id'];
 
 				$query3 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, p.comentarios,
-				u.nome_admin AS usuario_nome, 
-				c.nome AS categoria_nome,
-				COUNT(cmt.id) AS numero_comentarios
- FROM postagens p 
- JOIN admin u ON p.usuario_id = u.id 
- JOIN categorias c ON p.categoria_id = c.id
- LEFT JOIN comentarios_postagens cmt ON p.id = cmt.postagem_id
- WHERE p.id != :id 
- GROUP BY p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, u.nome_admin, c.nome
- ORDER BY p.criado_em DESC";
+                                  u.nome_admin AS usuario_nome, 
+                                  c.nome AS categoria_nome,
+                                  COUNT(DISTINCT cmt.id) AS numero_comentarios,
+                                  GROUP_CONCAT(DISTINCT t.nome) as tags
+                           FROM postagens p 
+                           JOIN admin u ON p.usuario_id = u.id 
+                           JOIN categorias c ON p.categoria_id = c.id
+                           LEFT JOIN comentarios_postagens cmt ON p.id = cmt.postagem_id
+                           LEFT JOIN postagem_tags pt ON p.id = pt.postagem_id
+                           LEFT JOIN tags t ON pt.tag_id = t.id
+                           WHERE p.id != :id 
+                           GROUP BY p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, u.nome_admin, c.nome
+                           ORDER BY p.criado_em DESC";
 
 				$stmt3 = $connection->prepare($query3);
 				$stmt3->bindParam(':id', $idMaisVisto, PDO::PARAM_INT);
@@ -73,6 +87,12 @@ LIMIT 1";
 
 		foreach ($postagensRecente as &$postagem) {
 			$postagem['conteudo'] = html_entity_decode($postagem['conteudo'], ENT_QUOTES, 'UTF-8');
+
+			if (!empty($postagem['tags'])) {
+				$postagem['tags'] = explode(',', $postagem['tags']);
+			} else {
+				$postagem['tags'] = [];
+			}
 		}
 
 		$response = [
