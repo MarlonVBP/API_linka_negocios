@@ -1,15 +1,11 @@
 <?php
-// Configurar CORS
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
+include '../../cors.php';
+include '../../conn.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
-
-include '../../conn.php'; // Conectar ao banco de dados
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -21,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    // Obter IDs dos comentários que foram visualizados
+
     $data = json_decode(file_get_contents('php://input'), true);
     $ids = isset($data) ? $data : [];
 
@@ -33,11 +29,11 @@ try {
         exit;
     }
 
-    // Criar placeholders para a consulta
+
     $ids_placeholder = implode(',', array_fill(0, count($ids), '?'));
     $update = "UPDATE contato SET visualizado = false WHERE id IN ($ids_placeholder)";
 
-    // Preparar e executar a consulta
+
     $stmt = $connection->prepare($update);
     $stmt->execute($ids);
 
@@ -52,6 +48,5 @@ try {
         'message' => 'Erro no servidor: ' . $e->getMessage(),
     ]);
 } finally {
-    $connection = null; // Fechar a conexão
+    $connection = null;
 }
-?>

@@ -23,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (empty($htmlContent)) return $htmlContent;
 
         $dom = new DOMDocument();
-        // Suprime erros de HTML malformado e configura UTF-8
         libxml_use_internal_errors(true);
         $dom->loadHTML(mb_convert_encoding($htmlContent, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         libxml_clear_errors();
@@ -34,12 +33,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         foreach ($images as $img) {
             $src = $img->getAttribute('src');
 
-            // Verifica se é uma imagem em Base64
             if (preg_match('/^data:image\/(\w+);base64,/', $src, $type)) {
                 $data = substr($src, strpos($src, ',') + 1);
-                $type = strtolower($type[1]); // jpg, png, gif, webp
+                $type = strtolower($type[1]);
 
-                // Valida extensão
+
                 if (!in_array($type, ['jpg', 'jpeg', 'gif', 'png', 'webp'])) {
                     continue;
                 }
@@ -50,11 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     continue;
                 }
 
-                // Gera nome único e define caminho
                 $fileName = uniqid() . '_' . time() . '.' . $type;
 
-                // CAMINHO ONDE A IMAGEM SERÁ SALVA (Ajuste conforme sua estrutura de pastas)
-                // Considerando que create.php está em public/posts/
                 $diretorioDestino = 'imagens/';
 
                 if (!is_dir($diretorioDestino)) {
@@ -63,13 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 file_put_contents($diretorioDestino . $fileName, $data);
 
-                // URL PÚBLICA PARA ACESSAR A IMAGEM
-                // Ajuste para a URL real da sua API
                 $webUrl = 'https://linkanegocios.com.br/api/public/posts/imagens/' . $fileName;
 
-                // Substitui o src base64 pela URL do arquivo
+
                 $img->setAttribute('src', $webUrl);
-                $img->setAttribute('class', 'img-fluid post-image'); // Adiciona classe CSS para responsividade
+                $img->setAttribute('class', 'img-fluid post-image');
                 $alterou = true;
             }
         }
@@ -83,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $tokenParts = explode('.', $token);
     $payload = json_decode(base64url_decode($tokenParts[1]));
-    $usuario_id = $payload->ID_USER ?? null; // Certifique-se que no seu criarJwt.php a chave é 'ID_USER' mesmo
+    $usuario_id = $payload->ID_USER ?? null;
 
     if (!$usuario_id) {
         http_response_code(403);

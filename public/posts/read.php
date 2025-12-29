@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 		$postagensRecente = [];
 
 		if ($id) {
+			// Lógica para postagem individual (incrementar views)
 			$updateQuery = "UPDATE postagens SET views = views + 1 WHERE id = :id";
 			$updateStmt = $connection->prepare($updateQuery);
 			$updateStmt->bindParam(':id', $id, PDO::PARAM_INT);
@@ -39,15 +40,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 			$stmt->execute();
 			$postagensRecente = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		} else {
-			$query2 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, p.comentarios,
+			// Busca do post mais visto (sem comentários)
+			$query2 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views,
                               u.nome_admin as usuario_nome, 
                               c.nome as categoria_nome,
-                              COUNT(DISTINCT cmt.id) as numero_comentarios,
                               GROUP_CONCAT(DISTINCT t.nome) as tags
                        FROM postagens p 
                        JOIN admin u ON p.usuario_id = u.id 
                        JOIN categorias c ON p.categoria_id = c.id
-                       LEFT JOIN comentarios_postagens cmt ON p.id = cmt.postagem_id
                        LEFT JOIN postagem_tags pt ON p.id = pt.postagem_id
                        LEFT JOIN tags t ON pt.tag_id = t.id
                        GROUP BY p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, u.nome_admin, c.nome
@@ -61,15 +61,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 			if ($postagensMaisVisto) {
 				$idMaisVisto = $postagensMaisVisto['id'];
 
-				$query3 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views, p.comentarios,
+				// Busca dos posts recentes (sem comentários)
+				$query3 = "SELECT p.id, p.titulo, p.conteudo, p.descricao, p.url_imagem, p.criado_em, p.views,
                                   u.nome_admin AS usuario_nome, 
                                   c.nome AS categoria_nome,
-                                  COUNT(DISTINCT cmt.id) AS numero_comentarios,
                                   GROUP_CONCAT(DISTINCT t.nome) as tags
                            FROM postagens p 
                            JOIN admin u ON p.usuario_id = u.id 
                            JOIN categorias c ON p.categoria_id = c.id
-                           LEFT JOIN comentarios_postagens cmt ON p.id = cmt.postagem_id
                            LEFT JOIN postagem_tags pt ON p.id = pt.postagem_id
                            LEFT JOIN tags t ON pt.tag_id = t.id
                            WHERE p.id != :id 
@@ -114,3 +113,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
 header('Content-Type: application/json');
 echo json_encode($response);
+?>

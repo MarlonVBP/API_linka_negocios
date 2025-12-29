@@ -4,7 +4,6 @@ include '../../conn.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Permitir apenas requisições POST
 if ($method === 'OPTIONS') {
     exit;
 }
@@ -18,7 +17,6 @@ if ($method !== 'POST') {
     exit;
 }
 
-// Obter e processar os dados JSON do corpo da solicitação
 $data = json_decode(file_get_contents("php://input"));
 
 if (!$data) {
@@ -31,7 +29,6 @@ if (!$data) {
 }
 
 try {
-    // Organizar e filtrar os dados recebidos
     $produto_id = htmlspecialchars(trim($data->id));
     $user_name = htmlspecialchars(trim($data->user_name));
     $profissao = htmlspecialchars(trim($data->profissao));
@@ -40,7 +37,6 @@ try {
     $conteudo = htmlspecialchars(trim($data->conteudo));
     $avaliacao = htmlspecialchars(trim($data->avaliacao));
 
-    // Validar os dados
     if (empty($produto_id) || empty($user_name) || empty($profissao) || empty($email) || empty($conteudo) || empty($avaliacao)) {
         http_response_code(400);
         echo json_encode([
@@ -59,7 +55,6 @@ try {
         exit;
     }
 
-    // Preparar a consulta SQL para inserção
     $query = "INSERT INTO `comentarios_produtos` (
             produto_id,
             user_name,
@@ -81,7 +76,6 @@ try {
 
     $stmt = $connection->prepare($query);
 
-    // Associar os valores aos parâmetros da consulta
     $stmt->bindValue(':produto_id', $produto_id, PDO::PARAM_INT);
     $stmt->bindValue(':user_name', $user_name, PDO::PARAM_STR);
     $stmt->bindValue(':profissao', $profissao, PDO::PARAM_STR);
@@ -90,7 +84,6 @@ try {
     $stmt->bindValue(':conteudo', $conteudo, PDO::PARAM_STR);
     $stmt->bindValue(':avaliacao', $avaliacao, PDO::PARAM_INT);
 
-    // Executar a consulta e verificar se a inserção foi bem-sucedida
     if ($stmt->execute()) {
         $queryUpdate = "UPDATE `postagens` 
         SET comentarios = comentarios + 1 
@@ -100,7 +93,7 @@ try {
         $stmtUpdate->bindValue(':produto_id', $produto_id, PDO::PARAM_INT);
         $stmtUpdate->execute();
 
-        http_response_code(201); // Criado
+        http_response_code(201);
         echo json_encode([
             'success' => 1,
             'message' => 'Dados inseridos com sucesso'
@@ -108,7 +101,6 @@ try {
         exit;
     }
 
-    // Se a inserção falhar, retornar uma mensagem de erro
     http_response_code(500);
     echo json_encode([
         'success' => 0,
@@ -116,7 +108,7 @@ try {
     ]);
     exit;
 } catch (PDOException $e) {
-    // Definir código de resposta HTTP para erro interno do servidor
+
     http_response_code(500);
     echo json_encode([
         'success' => 0,
@@ -124,3 +116,4 @@ try {
     ]);
     exit;
 }
+?>

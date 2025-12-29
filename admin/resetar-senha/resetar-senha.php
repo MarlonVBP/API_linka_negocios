@@ -17,14 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $token = $data->token;
     $new_password = password_hash($data->new_password, PASSWORD_BCRYPT);
 
-
     $query = "SELECT id FROM admin WHERE reset_token = ? AND reset_expires > NOW()";
     $stmt = $connection->prepare($query);
     $stmt->bindValue(1, $token);
     $stmt->execute();
 
     if ($stmt->rowCount() > 0) {
-
         $query = "UPDATE admin SET senha = ?, reset_token = NULL, reset_expires = NULL WHERE reset_token = ?";
         $stmt = $connection->prepare($query);
         $stmt->bindValue(1, $new_password);

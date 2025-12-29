@@ -1,7 +1,6 @@
 <?php
 include '../../cors.php';
 include '../../conn.php';
-//include '../../variaveis_globais/secretKey.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 

@@ -1,6 +1,4 @@
 <?php
-
-
 include '../../cors.php';
 include '../../conn.php';
 require_once '../../admin/login/jwtEhValido.php';

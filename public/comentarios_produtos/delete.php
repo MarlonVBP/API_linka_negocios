@@ -15,14 +15,12 @@ if ($method !== 'DELETE') {
     exit;
 }
 
-
 $token = $_COOKIE['auth_token'] ?? null;
 if (!$token || !jwt_eh_valido($token)) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Acesso negado.']);
     exit;
 }
-
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 
@@ -56,3 +54,4 @@ try {
         'message' => 'Erro no servidor: ' . $e->getMessage()
     ]);
 }
+?>

@@ -3,6 +3,15 @@
 include '../../cors.php';
 include '../../conn.php';
 
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    echo json_encode([
+        'success' => 0,
+        'message' => 'Metodo nao permitido. Apenas GET e aceito.',
+    ]);
+    exit;
+}
+
 try {
     $query = "SELECT COUNT(*) FROM postagens";
     $stmt = $connection->prepare($query);
@@ -10,7 +19,7 @@ try {
 
     $number = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if ($number) {
+    if ($number > 0) {
         http_response_code(200);
         echo json_encode([
             'success' => 1,
@@ -20,11 +29,10 @@ try {
         http_response_code(404);
         echo json_encode([
             'success' => 0,
-            'message' => 'Nenhuma categoria encontrada'
+            'message' => 'Nenhum artigo encontrado'
         ]);
     }
     exit;
-
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode([

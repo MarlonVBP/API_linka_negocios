@@ -1,8 +1,6 @@
 <?php
-// Definição do timezone para São Paulo América do Sul
 date_default_timezone_set('America/Sao_Paulo');
 
-// Credenciais do banco de dados
 // $host = "br440";
 // $database = "linkan76_linka_negocios";
 // $usuario = "linkan76_linka_negocios";
@@ -13,7 +11,6 @@ $database = "linknegocios";
 $usuario = "root";
 $senha = '';
 
-// Criação da conexão com o banco de dados usando PDO
 try {
     $dsn = 'mysql:host=' . $host . ';dbname=' . $database;
     $options = [

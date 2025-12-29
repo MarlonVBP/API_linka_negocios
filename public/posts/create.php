@@ -41,11 +41,9 @@ function processarImagensDoConteudo($htmlContent)
     foreach ($images as $img) {
         $src = $img->getAttribute('src');
 
-
         if (preg_match('/^data:image\/(\w+);base64,/', $src, $type)) {
             $data = substr($src, strpos($src, ',') + 1);
             $type = strtolower($type[1]);
-
 
             if (!in_array($type, ['jpg', 'jpeg', 'gif', 'png', 'webp'])) {
                 continue;
@@ -57,10 +55,7 @@ function processarImagensDoConteudo($htmlContent)
                 continue;
             }
 
-
             $fileName = uniqid() . '_' . time() . '.' . $type;
-
-
 
             $diretorioDestino = 'imagens/';
 
@@ -70,10 +65,7 @@ function processarImagensDoConteudo($htmlContent)
 
             file_put_contents($diretorioDestino . $fileName, $data);
 
-
-
             $webUrl = 'https://linkanegocios.com.br/api/public/posts/imagens/' . $fileName;
-
 
             $img->setAttribute('src', $webUrl);
             $img->setAttribute('class', 'img-fluid post-image');

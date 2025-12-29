@@ -2,7 +2,6 @@
 include '../../cors.php';
 include '../../conn.php';
 
-// Verificar se o método de requisição é GET
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     echo json_encode([
@@ -12,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     exit;
 }
 
-// Obter o parâmetro postagem_id da query string
 $postagem_id = isset($_GET['postagem_id']) ? htmlspecialchars(trim($_GET['postagem_id'])) : null;
 
 if (!$postagem_id) {

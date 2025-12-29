@@ -7,7 +7,6 @@ require '../../vendor/autoload.php';
 include '../../cors.php';
 include '../../conn.php';
 
-
 $data = json_decode(file_get_contents('php://input'));
 $email = isset($data->email) ? filter_var($data->email, FILTER_SANITIZE_EMAIL) : null;
 
@@ -18,12 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit();
   }
 
-
   if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(["error" => "E-mail inválido."]);
     exit();
   }
-
 
   $query = "SELECT id FROM admin WHERE email = :email";
   $stmt = $connection->prepare($query);
@@ -35,12 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $token = bin2hex(random_bytes(50));
     $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
-
     $updateQuery = "UPDATE admin SET reset_token = ?, reset_expires = ? WHERE email = ?";
     $updateStmt = $connection->prepare($updateQuery);
     $updateStmt->execute([$token, $expiry, $email]);
-
-
 
     $url_frontend = "https://linkanegocios.com.br/resetar-senha/";
     $reset_link = $url_frontend . $token;
@@ -58,7 +52,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
       $mail->Port = 587;
 
-
       $mail->SMTPOptions = array(
         'ssl' => array(
           'verify_peer' => false,
@@ -67,11 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         )
       );
 
-
       $mail->setFrom('marlonvicctor13@gmail.com', 'LinkaNegocios');
       $mail->addAddress($email);
-
-
       $mail->isHTML(true);
       $mail->Subject = 'Redefinir sua senha';
       $mail->Body = "
@@ -98,13 +88,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
       echo json_encode([
         "message" => "Email de redefinição enviado com sucesso!",
-
       ]);
     } catch (Exception $e) {
       echo json_encode(["error" => "Erro ao enviar o e-mail: {$mail->ErrorInfo}"]);
     }
   } else {
-
     echo json_encode(["error" => "E-mail não encontrado em nossa base de dados."]);
   }
 } else {

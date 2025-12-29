@@ -88,5 +88,4 @@ try {
     ]);
     file_put_contents('log.txt', 'PDOException: ' . $e->getMessage() . "\n", FILE_APPEND); // Log do erro PDO
 }
-
 ?>

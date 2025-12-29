@@ -40,11 +40,6 @@ CREATE TABLE IF NOT EXISTS postagens (
         NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS paginas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS ProdutoDivulgacao (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo_breve VARCHAR(255) NOT NULL,
@@ -93,56 +88,6 @@ CREATE TABLE IF NOT EXISTS comentarios_produtos (
     FOREIGN KEY (produto_id) REFERENCES ProdutoDivulgacao(id) ON DELETE CASCADE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `comentarios_postagens`;
-
-CREATE TABLE IF NOT EXISTS comentarios_postagens (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    postagem_id INT NOT NULL,
-    user_name VARCHAR(50) NOT NULL,
-    profissao VARCHAR(50),
-    empresa VARCHAR(50),
-    email VARCHAR(255) NOT NULL,
-    conteudo TEXT NOT NULL,
-    avaliacao INT CHECK (
-        avaliacao >= 1
-        AND avaliacao <= 5
-    ),
-    visualizado BOOLEAN DEFAULT true,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-DROP TABLE IF EXISTS `comentarios_paginas`;
-
-CREATE TABLE IF NOT EXISTS comentarios_paginas (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    pagina_id INT NOT NULL,
-    user_name VARCHAR(50) NOT NULL,
-    profissao VARCHAR(50),
-    empresa VARCHAR(50),
-    email VARCHAR(255) NOT NULL,
-    conteudo TEXT NOT NULL,
-    avaliacao INT CHECK (
-        avaliacao >= 1
-        AND avaliacao <= 5
-    ),
-    visualizado BOOLEAN DEFAULT true,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (pagina_id) REFERENCES paginas(id) ON DELETE CASCADE
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS avaliacao_empresa (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(50) NOT NULL,
-    avaliacao INT NOT NULL CHECK (
-        avaliacao >= 1
-        AND avaliacao <= 5
-    ),
-    mensagem VARCHAR(255) NOT NULL,
-    foto_perfil VARCHAR(255),
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS tags (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -176,17 +121,6 @@ CREATE TABLE IF NOT EXISTS faq (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS servicos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    descricao TEXT NOT NULL,
-    imagem VARCHAR(255) NOT NULL,
-    conteudo1 TEXT NOT NULL,
-    conteudo2 TEXT NOT NULL,
-    conteudo3 TEXT NOT NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 CREATE TABLE IF NOT EXISTS dashboard (
     id INT AUTO_INCREMENT PRIMARY KEY,
     mes VARCHAR(20) NOT NULL,
@@ -194,26 +128,9 @@ CREATE TABLE IF NOT EXISTS dashboard (
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS motivos_escolher_empresa (
+CREATE TABLE IF NOT EXISTS newsletter (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    imagem VARCHAR(255) NOT NULL,
-    titulo VARCHAR(255) NOT NULL,
-    descricao TEXT NOT NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS casos_sucesso (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    titulo VARCHAR(100) NOT NULL,
-    mensagem TEXT,
-    imagem VARCHAR(255) NOT NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS equipe_linka_negocios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    descricao TEXT,
-    imagem VARCHAR(255) NOT NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    email VARCHAR(255) NOT NULL UNIQUE,
+    ativo TINYINT(1) DEFAULT 1,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -2,7 +2,6 @@
 include '../../cors.php';
 include '../../conn.php';
 
-// Verificar se o método de requisição é GET
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     echo json_encode([
@@ -19,7 +18,7 @@ try {
 
     $titles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($titles as &$title){
+    foreach ($titles as &$title) {
         $date = new DateTime($title['criado_em']);
         $title['criado_em'] = $date->format('d M, Y');
     }
@@ -39,8 +38,7 @@ try {
     }
     exit;
 } catch (PDOException $e) {
-    // Registre o erro em um log, mas exiba uma mensagem genérica
-    // error_log($e->getMessage()); // Exemplo de log em arquivo
+
     http_response_code(500);
     echo json_encode([
         'success' => 0,
