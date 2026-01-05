@@ -42,25 +42,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $mail = new PHPMailer(true);
 
     try {
+      $anoAtual = date('Y');
 
       $mail->isSMTP();
       $mail->CharSet = 'UTF-8';
-      $mail->Host = 'smtp-relay.brevo.com';
+      $mail->Host = 'smtp.titan.email';
       $mail->SMTPAuth = true;
-      $mail->Username = '7efcfa001@smtp-brevo.com';
-      $mail->Password = 'pzqFRB725kavVNSm';
-      $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-      $mail->Port = 587;
-
-      $mail->SMTPOptions = array(
-        'ssl' => array(
-          'verify_peer' => false,
-          'verify_peer_name' => false,
-          'allow_self_signed' => true
-        )
-      );
-
-      $mail->setFrom('marlonvicctor13@gmail.com', 'LinkaNegocios');
+      $mail->Username = 'contato@linkanegocios.com.br';
+      $mail->Password = '*********8';
+      $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+      $mail->Port = 465;
+      $mail->setFrom('contato@linkanegocios.com.br', 'Linka Negócios');
       $mail->addAddress($email);
       $mail->isHTML(true);
       $mail->Subject = 'Redefinir sua senha';
@@ -78,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                           <p style='font-size: 12px; color: #dc3545; margin-top: 20px;'>Aviso: este link é válido por apenas 1 hora após o envio deste e-mail.</p>
                         </div>
                         <div style='background-color: #f2f1ed; color: #7b7b7b; padding: 10px; text-align: center; font-size: 12px;'>
-                          <p>&copy; 2024 Linka Negócios. Todos os direitos reservados.</p>
+                          <p>&copy; $anoAtual Linka Negócios. Todos os direitos reservados.</p>
                         </div>
                       </div>
                     </div>";

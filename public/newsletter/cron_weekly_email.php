@@ -16,7 +16,6 @@ include '../../cors.php';
 include '../../conn.php';
 require '../../vendor/autoload.php';
 
-
 try {
     $queryPosts = "SELECT id, titulo, descricao, url_imagem, views, criado_em 
                    FROM postagens 
@@ -36,13 +35,9 @@ try {
     die("Erro ao buscar posts: " . $e->getMessage());
 }
 
-
-
 $tituloTop1 = (strlen($posts[0]['titulo']) > 40) ? substr($posts[0]['titulo'], 0, 40) . '...' : $posts[0]['titulo'];
 $mesAtual = date('m/Y');
 $assuntoEmail = "Destaques de $mesAtual: $tituloTop1 e muito mais";
-
-
 $anoAtual = date('Y');
 $fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 $corPrimaria = "#b22828";
@@ -51,9 +46,6 @@ $corCard = "#ffffff";
 $corTexto = "#212121";
 $corCinza = "#555555";
 $corFooter = "#333333";
-
-
-
 $emailTemplate = "
 <!DOCTYPE html>
 <html lang='pt-BR'>
@@ -148,7 +140,6 @@ foreach ($posts as $post) {
     $rank++;
 }
 
-
 $emailTemplate .= "
                     <tr>
                         <td align='center' style='background-color: $corFooter; padding: 40px 20px;'>
@@ -177,7 +168,6 @@ $emailTemplate .= "
 </html>
 ";
 
-
 try {
     $querySubs = "SELECT email FROM newsletter WHERE ativo = 1";
     $stmtSubs = $connection->prepare($querySubs);
@@ -193,19 +183,14 @@ $mail->SMTPDebug = 0;
 try {
     $mail->isSMTP();
     $mail->CharSet = 'UTF-8';
-
-    
     $mail->Host       = 'smtp.titan.email';
     $mail->SMTPAuth   = true;
     $mail->Username   = 'contato@linkanegocios.com.br';
     $mail->Password   = '*********8'; 
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
     $mail->Port       = 465;
-
     $mail->setFrom('contato@linkanegocios.com.br', 'Linka Negócios');
     $mail->isHTML(true);
-
-    
     $mail->Subject = $assuntoEmail;
     $mail->AltBody = "Destaques do mês na Linka Negócios. Top 1: $tituloTop1. Acesse o site para ler mais.";
 
@@ -215,16 +200,13 @@ try {
             try {
                 
                 $linkUnsub = "https://linkanegocios.com.br/api/public/newsletter/unsubscribe.php?e=" . base64_encode($sub['email']);
-
-                
                 $corpoFinal = str_replace('{{LINK_DESCADASTRO}}', $linkUnsub, $emailTemplate);
-
                 $mail->Body = $corpoFinal;
-
                 $mail->addAddress($sub['email']);
                 $mail->send();
                 $enviados++;
-                $mail->clearAddresses(); 
+                $mail->clearAddresses();
+                 
             } catch (Exception $e) {
                 $mail->clearAddresses();
                 continue;
