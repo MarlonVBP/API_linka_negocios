@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       $mail->Host = 'smtp.titan.email';
       $mail->SMTPAuth = true;
       $mail->Username = 'contato@linkanegocios.com.br';
-      $mail->Password = '*********8';
+      $mail->Password = '*******8';
       $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
       $mail->Port = 465;
       $mail->setFrom('contato@linkanegocios.com.br', 'Linka Negócios');
