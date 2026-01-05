@@ -157,17 +157,17 @@ try {
 }
 
 $mail = new PHPMailer(true);
-$mail->SMTPDebug = 0;
+$mail->SMTPDebug = 2;
 
 try {
     $mail->isSMTP();
     $mail->CharSet = 'UTF-8';
-    $mail->Host       = 'smtp-relay.brevo.com';
+    $mail->Host       = 'smtp.titan.email';
     $mail->SMTPAuth   = true;
-    $mail->Username   = '7efcfa001@smtp-brevo.com';
-    $mail->Password   = 'pzqFRB725kavVNSm';
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port       = 587;
+    $mail->Username   = 'contato@linkanegocios.com.br';
+    $mail->Password   = '********8';
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    $mail->Port       = 465;
     $mail->SMTPOptions = array(
         'ssl' => array(
             'verify_peer' => false,
@@ -175,7 +175,7 @@ try {
             'allow_self_signed' => true
         )
     );
-    $mail->setFrom('marlonvicctor13@gmail.com', 'Linka Negócios');
+    $mail->setFrom('contato@linkanegocios.com.br', 'Linka Negócios');
     $mail->isHTML(true);
     $mail->Subject = 'Os Artigos Mais Lidos do Mês - Linka Negócios';
     $mail->Body    = $emailContent;
