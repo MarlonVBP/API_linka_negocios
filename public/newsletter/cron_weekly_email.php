@@ -16,6 +16,7 @@ include '../../cors.php';
 include '../../conn.php';
 require '../../vendor/autoload.php';
 
+
 try {
     $queryPosts = "SELECT id, titulo, descricao, url_imagem, views, criado_em 
                    FROM postagens 
@@ -35,42 +36,68 @@ try {
     die("Erro ao buscar posts: " . $e->getMessage());
 }
 
-$mesAtual = date('m/Y');
-$anoAtual = date('Y');
 
+
+$tituloTop1 = (strlen($posts[0]['titulo']) > 40) ? substr($posts[0]['titulo'], 0, 40) . '...' : $posts[0]['titulo'];
+$mesAtual = date('m/Y');
+$assuntoEmail = "Destaques de $mesAtual: $tituloTop1 e muito mais";
+
+
+$anoAtual = date('Y');
 $fontFamily = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 $corPrimaria = "#b22828";
 $corFundo = "#f4f4f4";
-$corTexto = "#333333";
-$corCinza = "#666666";
+$corCard = "#ffffff";
+$corTexto = "#212121";
+$corCinza = "#555555";
+$corFooter = "#333333";
 
-$emailContent = "
+
+
+$emailTemplate = "
 <!DOCTYPE html>
-<html>
+<html lang='pt-BR'>
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Newsletter Linka Negócios</title>
+    <title>$assuntoEmail</title>
+    <style>
+        body { margin: 0; padding: 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        table { border-collapse: collapse !important; }
+        @media only screen and (max-width: 600px) {
+            .container { width: 100% !important; }
+            .content-padding { padding: 20px !important; }
+        }
+    </style>
 </head>
 <body style='margin: 0; padding: 0; background-color: $corFundo; font-family: $fontFamily;'>
-    
-    <table border='0' cellpadding='0' cellspacing='0' width='100%' style='background-color: $corFundo; padding: 40px 0;'>
+
+    <table border='0' cellpadding='0' cellspacing='0' width='100%' style='background-color: $corFundo;'>
         <tr>
-            <td align='center'>
+            <td align='center' style='padding: 40px 0;'>
                 
-                <table border='0' cellpadding='0' cellspacing='0' width='600' style='background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); max-width: 600px; width: 100%;'>
+                <table border='0' cellpadding='0' cellspacing='0' width='600' class='container' style='background-color: $corCard; width: 600px; max-width: 100%; margin: 0 auto; box-shadow: 0 1px 3px rgba(0,0,0,0.1);'>
                     
                     <tr>
-                        <td align='center' style='padding: 40px 0 30px 0; background-color: #ffffff; border-bottom: 3px solid $corPrimaria;'>
-                            <h1 style='color: $corPrimaria; margin: 0; font-size: 28px; text-transform: uppercase; letter-spacing: 1px;'>Linka Negócios</h1>
-                            <p style='color: $corCinza; font-size: 14px; margin-top: 5px; text-transform: uppercase;'>Destaques do Mês • $mesAtual</p>
+                        <td align='center' style='background-color: $corPrimaria; padding: 30px 20px;'>
+                            <h1 style='color: #ffffff; margin: 0; font-size: 24px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700;'>
+                                Linka Negócios
+                            </h1>
+                            <p style='color: #ffffff; margin: 5px 0 0 0; font-size: 13px; opacity: 0.9; text-transform: uppercase;'>
+                                Edição Mensal • $mesAtual
+                            </p>
                         </td>
                     </tr>
 
                     <tr>
-                        <td style='padding: 30px 40px; color: $corTexto; font-size: 16px; line-height: 1.6;'>
-                            <p style='margin: 0;'>Olá! 👋</p>
-                            <p style='margin-top: 10px;'>Selecionamos os <strong>5 artigos mais lidos</strong> pela nossa comunidade este mês. Conteúdo direto ao ponto para alavancar seu conhecimento.</p>
+                        <td class='content-padding' style='padding: 40px 40px 20px 40px; text-align: left;'>
+                            <h2 style='color: $corTexto; margin: 0 0 15px 0; font-size: 20px; font-weight: bold;'>
+                                Olá! 👋
+                            </h2>
+                            <p style='color: $corCinza; margin: 0; font-size: 16px; line-height: 1.6;'>
+                                Aqui estão os assuntos que movimentaram nossa comunidade este mês. Selecionamos os <strong>5 artigos mais lidos</strong> para você.
+                            </p>
                         </td>
                     </tr>
 ";
@@ -78,67 +105,70 @@ $emailContent = "
 $rank = 1;
 foreach ($posts as $post) {
     $linkPost = "https://www.linkanegocios.com.br/read-more/" . $post['id'];
-
     $imgSrc = $post['url_imagem'];
     if (strpos($imgSrc, 'http') === false) {
         $imgSrc = "https://linkanegocios.com.br/api/public/posts/" . $imgSrc;
     }
 
-    $emailContent .= "
+    $emailTemplate .= "
                     <tr>
-                        <td style='padding: 0 40px 40px 40px;'>
-                            <div style='border: 1px solid #eeeeee; border-radius: 8px; overflow: hidden;'>
-                                
-                                <a href='$linkPost' style='text-decoration: none; display: block;'>
-                                    <img src='$imgSrc' alt='{$post['titulo']}' style='width: 100%; height: auto; display: block; border-bottom: 1px solid #eeeeee;'>
-                                </a>
-
-                                <div style='padding: 25px;'>
-                                    <span style='background-color: $corPrimaria; color: #ffffff; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;'>
-                                        TOP #$rank
-                                    </span>
-
-                                    <h3 style='margin: 15px 0 10px 0; font-size: 20px; line-height: 1.4; color: $corTexto;'>
-                                        <a href='$linkPost' style='text-decoration: none; color: $corTexto;'>{$post['titulo']}</a>
-                                    </h3>
-
-                                    <p style='color: $corCinza; font-size: 15px; line-height: 1.6; margin: 0 0 20px 0;'>
-                                        " . substr(strip_tags($post['descricao']), 0, 110) . "...
-                                    </p>
-
-                                    <table border='0' cellpadding='0' cellspacing='0' style='margin-top: 10px;'>
-                                        <tr>
-                                            <td align='center' bgcolor='$corPrimaria' style='border-radius: 6px;'>
-                                                <a href='$linkPost' style='background-color: #b22828; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-size: 14px;'>
-                                                    Ler Artigo Completo
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    </div>
-                            </div>
+                        <td class='content-padding' style='padding: 20px 40px 40px 40px;'>
+                            <a href='$linkPost' style='text-decoration: none; display: block;'>
+                                <img src='$imgSrc' alt='{$post['titulo']}' style='width: 100%; max-width: 600px; height: auto; display: block; border: 1px solid #eeeeee;'>
+                            </a>
+                            
+                            <table border='0' cellpadding='0' cellspacing='0' width='100%'>
+                                <tr>
+                                    <td style='padding-top: 20px; text-align: left;'>
+                                        <p style='color: $corPrimaria; font-size: 12px; font-weight: bold; text-transform: uppercase; margin: 0 0 5px 0;'>
+                                            TOP #$rank
+                                        </p>
+                                        <h3 style='margin: 0 0 10px 0; font-size: 20px; line-height: 1.3; color: $corTexto; font-weight: bold;'>
+                                            <a href='$linkPost' style='color: $corTexto; text-decoration: none;'>{$post['titulo']}</a>
+                                        </h3>
+                                        <p style='color: $corCinza; font-size: 15px; line-height: 1.6; margin: 0 0 15px 0;'>
+                                            " . substr(strip_tags($post['descricao']), 0, 130) . "...
+                                        </p>
+                                        <table border='0' cellpadding='0' cellspacing='0'>
+                                            <tr>
+                                                <td align='left' style='padding-top: 5px;'>
+                                                    <a href='$linkPost' style='color: $corPrimaria; font-size: 15px; font-weight: bold; text-decoration: none; border-bottom: 2px solid $corPrimaria; padding-bottom: 2px;'>
+                                                        Ler matéria completa &rarr;
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div style='border-bottom: 1px solid #eeeeee; margin-top: 30px;'></div>
                         </td>
                     </tr>
     ";
     $rank++;
 }
 
-$emailContent .= "
+
+$emailTemplate .= "
                     <tr>
-                        <td align='center' style='padding: 30px; background-color: #f9f9f9; border-top: 1px solid #eeeeee;'>
-                            <p style='margin: 0 0 10px 0; font-size: 14px; font-weight: bold; color: $corTexto;'>Linka Negócios</p>
-                            <p style='margin: 0; font-size: 12px; color: #999999; line-height: 1.5;'>
+                        <td align='center' style='background-color: $corFooter; padding: 40px 20px;'>
+                            <p style='color: #ffffff; font-size: 16px; font-weight: bold; margin: 0 0 10px 0;'>
+                                Linka Negócios
+                            </p>
+                            <p style='color: #cccccc; font-size: 12px; line-height: 1.5; margin: 0 0 20px 0;'>
+                                Enviado para nossa lista de assinantes VIP.<br>
                                 © $anoAtual Todos os direitos reservados.
                             </p>
-                            <p style='margin-top: 15px; font-size: 12px;'>
-                                <a href='https://www.linkanegocios.com.br' style='color: $corPrimaria; text-decoration: none;'>Visitar Site</a>
+                            <p style='margin: 0; font-size: 12px;'>
+                                <a href='https://www.linkanegocios.com.br' style='color: #ffffff; text-decoration: none; font-weight: bold;'>Acessar Site</a>
+                                <span style='color: #666666; margin: 0 10px;'>|</span>
+                                <a href='{{LINK_DESCADASTRO}}' style='color: #999999; text-decoration: underline;'>Cancelar subscrição</a>
                             </p>
                         </td>
                     </tr>
 
                 </table>
-                <div style='height: 40px;'></div>
-
+                <div style='height: 40px;'>&nbsp;</div>
             </td>
         </tr>
     </table>
@@ -146,6 +176,7 @@ $emailContent .= "
 </body>
 </html>
 ";
+
 
 try {
     $querySubs = "SELECT email FROM newsletter WHERE ativo = 1";
@@ -157,38 +188,43 @@ try {
 }
 
 $mail = new PHPMailer(true);
-$mail->SMTPDebug = 2;
+$mail->SMTPDebug = 0;
 
 try {
     $mail->isSMTP();
     $mail->CharSet = 'UTF-8';
+
+    
     $mail->Host       = 'smtp.titan.email';
     $mail->SMTPAuth   = true;
     $mail->Username   = 'contato@linkanegocios.com.br';
-    $mail->Password   = '********8';
+    $mail->Password   = '*********8'; 
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
     $mail->Port       = 465;
-    $mail->SMTPOptions = array(
-        'ssl' => array(
-            'verify_peer' => false,
-            'verify_peer_name' => false,
-            'allow_self_signed' => true
-        )
-    );
+
     $mail->setFrom('contato@linkanegocios.com.br', 'Linka Negócios');
     $mail->isHTML(true);
-    $mail->Subject = 'Os Artigos Mais Lidos do Mês - Linka Negócios';
-    $mail->Body    = $emailContent;
-    $mail->AltBody = 'Veja os top 5 artigos do mês em linkanegocios.com.br';
+
+    
+    $mail->Subject = $assuntoEmail;
+    $mail->AltBody = "Destaques do mês na Linka Negócios. Top 1: $tituloTop1. Acesse o site para ler mais.";
 
     $enviados = 0;
     if (count($subscribers) > 0) {
         foreach ($subscribers as $sub) {
             try {
+                
+                $linkUnsub = "https://linkanegocios.com.br/api/public/newsletter/unsubscribe.php?e=" . base64_encode($sub['email']);
+
+                
+                $corpoFinal = str_replace('{{LINK_DESCADASTRO}}', $linkUnsub, $emailTemplate);
+
+                $mail->Body = $corpoFinal;
+
                 $mail->addAddress($sub['email']);
                 $mail->send();
                 $enviados++;
-                $mail->clearAddresses();
+                $mail->clearAddresses(); 
             } catch (Exception $e) {
                 $mail->clearAddresses();
                 continue;
