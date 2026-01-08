@@ -125,7 +125,7 @@ foreach ($posts as $post) {
                                             <tr>
                                                 <td align='left' style='padding-top: 5px;'>
                                                     <a href='$linkPost' style='color: $corPrimaria; font-size: 15px; font-weight: bold; text-decoration: none; border-bottom: 2px solid $corPrimaria; padding-bottom: 2px;'>
-                                                        Ler matéria completa &rarr;
+                                                        Ler artigo completo &rarr;
                                                     </a>
                                                 </td>
                                             </tr>

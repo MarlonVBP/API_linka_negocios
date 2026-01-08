@@ -19,30 +19,32 @@ if ($method !== 'POST') {
 
 $data = json_decode(file_get_contents("php://input"));
 $id = isset($data->id) ? intval($data->id) : null;
+$nome = isset($data->nome) ? htmlspecialchars(trim($data->nome)) : null;
 
-if ($id === null) {
+if ($id === null || empty($nome)) {
     echo json_encode([
         'success' => 0,
-        'message' => 'ID é obrigatório.'
+        'message' => 'ID e Nome são obrigatórios.'
     ]);
     exit;
 }
 
 try {
-    $query = "DELETE FROM categorias WHERE id = :id";
+    $query = "UPDATE tags SET nome = :nome WHERE id = :id";
     $stmt = $connection->prepare($query);
+    $stmt->bindValue(':nome', $nome, PDO::PARAM_STR);
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
     if ($stmt->execute()) {
         http_response_code(200);
         echo json_encode([
             'success' => 1,
-            'message' => 'Categoria excluída com sucesso'
+            'message' => 'Tag atualizada com sucesso'
         ]);
     } else {
         echo json_encode([
             'success' => 0,
-            'message' => 'Falha ao excluir categoria'
+            'message' => 'Falha ao atualizar tag'
         ]);
     }
 } catch (PDOException $e) {

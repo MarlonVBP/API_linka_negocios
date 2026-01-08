@@ -5,7 +5,6 @@ require_once '../../admin/login/jwtEhValido.php';
 
 header('Content-Type: application/json');
 
-
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     header('Content-Type: application/json');
@@ -37,19 +36,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $data = substr($src, strpos($src, ',') + 1);
                 $type = strtolower($type[1]);
 
-
                 if (!in_array($type, ['jpg', 'jpeg', 'gif', 'png', 'webp'])) {
                     continue;
                 }
 
                 $data = base64_decode($data);
-
                 if ($data === false) {
                     continue;
                 }
 
                 $fileName = uniqid() . '_' . time() . '.' . $type;
-
                 $diretorioDestino = 'imagens/';
 
                 if (!is_dir($diretorioDestino)) {
@@ -59,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 file_put_contents($diretorioDestino . $fileName, $data);
 
                 $webUrl = 'https://linkanegocios.com.br/api/public/posts/imagens/' . $fileName;
-
 
                 $img->setAttribute('src', $webUrl);
                 $img->setAttribute('class', 'img-fluid post-image');
@@ -97,7 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $target_file = null;
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK) {
-
             $fileTmpPath = $_FILES['image']['tmp_name'];
             $fileNameOriginal = $_FILES['image']['name'];
 
@@ -110,7 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $allowedMimeTypes = array('image/jpeg', 'image/png', 'image/gif', 'image/webp');
 
             if (in_array($fileExtension, $allowedfileExtensions) && in_array($fileMimeType, $allowedMimeTypes)) {
-
                 $newFileName = md5(time() . $fileNameOriginal) . '.' . $fileExtension;
                 $uploadFileDir = 'imagens/';
                 $target_file = $uploadFileDir . $newFileName;
@@ -128,15 +121,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             } else {
                 http_response_code(400);
-                echo json_encode(['success' => false, 'message' => 'Arquivo de imagem inválido (Formato ou extensão não permitidos).']);
+                echo json_encode(['success' => false, 'message' => 'Arquivo de imagem inválido.']);
                 exit;
             }
         }
+
         $query = "UPDATE postagens SET categoria_id = :categoria_id, titulo = :titulo, conteudo = :conteudo, descricao = :descricao";
         if ($image_updated) {
             $query .= ", url_imagem = :url_imagem";
         }
-        $query .= " WHERE id = :post_id AND usuario_id = :usuario_id";
+        $query .= " WHERE id = :post_id";
 
         try {
             $stmt = $connection->prepare($query);
@@ -145,29 +139,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->bindValue(':conteudo', $content, PDO::PARAM_STR);
             $stmt->bindValue(':descricao', $description, PDO::PARAM_STR);
             $stmt->bindValue(':post_id', $post_id, PDO::PARAM_INT);
-            $stmt->bindValue(':usuario_id', $usuario_id, PDO::PARAM_INT);
 
             if ($image_updated) {
                 $stmt->bindValue(':url_imagem', $target_file, PDO::PARAM_STR);
             }
 
             if ($stmt->execute()) {
-                if ($stmt->rowCount() > 0) {
-                    $response = [
-                        'success' => true,
-                        'message' => 'Postagem atualizada com sucesso',
-                        'data' => [
-                            'id' => $post_id,
-                            'title' => $title,
-                            'image' => $image_updated ? $target_file : null
-                        ]
-                    ];
-                } else {
-                    $response = [
-                        'success' => false,
-                        'message' => 'Nenhuma alteração feita ou você não tem permissão para editar este post.'
-                    ];
-                }
+                $response = [
+                    'success' => true,
+                    'message' => 'Postagem atualizada com sucesso',
+                    'data' => [
+                        'id' => $post_id,
+                        'title' => $title,
+                        'image' => $image_updated ? $target_file : null
+                    ]
+                ];
             } else {
                 $response = [
                     'success' => false,

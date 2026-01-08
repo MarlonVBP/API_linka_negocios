@@ -1,7 +1,6 @@
 <?php
 include '../../cors.php';
 include '../../conn.php';
-
 require_once '../../admin/login/jwtEhValido.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -10,11 +9,11 @@ if ($method === 'OPTIONS') {
     exit;
 }
 
-if ($method !== 'PUT') {
+if ($method !== 'POST') {
     http_response_code(405);
     echo json_encode([
         'success' => 0,
-        'message' => 'Metodo nao permitido. Apenas PUT e aceito.',
+        'message' => 'Metodo nao permitido. Para upload de arquivos, utilize POST.',
     ]);
     exit;
 }
@@ -35,8 +34,7 @@ if (!isset($payload->ID_USER)) {
     exit;
 }
 
-$data = json_decode(file_get_contents("php://input"));
-$id = isset($data->id) ? intval($data->id) : null;
+$id = isset($_POST['id']) ? intval($_POST['id']) : null;
 
 if ($id === null) {
     echo json_encode([
@@ -44,6 +42,11 @@ if ($id === null) {
         'message' => 'ID do registro não fornecido.'
     ]);
     exit;
+}
+
+function sanitize_input($data)
+{
+    return htmlspecialchars(strip_tags($data ?? ''));
 }
 
 try {
@@ -54,28 +57,63 @@ try {
 
     if ($select_stmt->rowCount() > 0) {
 
-        $titulo_breve = isset($data->titulo_breve) ? htmlspecialchars(trim($data->titulo_breve)) : null;
-        $detalhes_problema_beneficios = isset($data->detalhes_problema_beneficios) ? htmlspecialchars(trim($data->detalhes_problema_beneficios)) : null;
-        $destaque_problemas = isset($data->destaque_problemas) ? htmlspecialchars(trim($data->destaque_problemas)) : null;
-        $destaque_beneficio1 = isset($data->destaque_beneficio1) ? htmlspecialchars(trim($data->destaque_beneficio1)) : null;
-        $destaque_beneficio2 = isset($data->destaque_beneficio2) ? htmlspecialchars(trim($data->destaque_beneficio2)) : null;
-        $destaque_beneficio3 = isset($data->destaque_beneficio3) ? htmlspecialchars(trim($data->destaque_beneficio3)) : null;
-        $cta = isset($data->cta) ? htmlspecialchars(trim($data->cta)) : null;
-        $imagem_placeholder = isset($data->imagem_placeholder) ? htmlspecialchars(trim($data->imagem_placeholder)) : null;
-        $problema_beneficio1 = isset($data->problema_beneficio1) ? htmlspecialchars(trim($data->problema_beneficio1)) : null;
-        $problema_beneficio2 = isset($data->problema_beneficio2) ? htmlspecialchars(trim($data->problema_beneficio2)) : null;
-        $problema_beneficio3 = isset($data->problema_beneficio3) ? htmlspecialchars(trim($data->problema_beneficio3)) : null;
-        $porque_clicar = isset($data->porque_clicar) ? htmlspecialchars(trim($data->porque_clicar)) : null;
-        $pergunta1 = isset($data->pergunta1) ? htmlspecialchars(trim($data->pergunta1)) : null;
-        $resposta1 = isset($data->resposta1) ? htmlspecialchars(trim($data->resposta1)) : null;
-        $pergunta2 = isset($data->pergunta2) ? htmlspecialchars(trim($data->pergunta2)) : null;
-        $resposta2 = isset($data->resposta2) ? htmlspecialchars(trim($data->resposta2)) : null;
-        $pergunta3 = isset($data->pergunta3) ? htmlspecialchars(trim($data->pergunta3)) : null;
-        $resposta3 = isset($data->resposta3) ? htmlspecialchars(trim($data->resposta3)) : null;
-        $pergunta4 = isset($data->pergunta4) ? htmlspecialchars(trim($data->pergunta4)) : null;
-        $resposta4 = isset($data->resposta4) ? htmlspecialchars(trim($data->resposta4)) : null;
-        $pergunta5 = isset($data->pergunta5) ? htmlspecialchars(trim($data->pergunta5)) : null;
-        $resposta5 = isset($data->resposta5) ? htmlspecialchars(trim($data->resposta5)) : null;
+        $titulo_breve = sanitize_input($_POST['titulo_breve'] ?? null);
+        $detalhes_problema_beneficios = sanitize_input($_POST['detalhes_problema_beneficios'] ?? null);
+        $destaque_problemas = sanitize_input($_POST['destaque_problemas'] ?? null);
+        $destaque_beneficio1 = sanitize_input($_POST['destaque_beneficio1'] ?? null);
+        $destaque_beneficio2 = sanitize_input($_POST['destaque_beneficio2'] ?? null);
+        $destaque_beneficio3 = sanitize_input($_POST['destaque_beneficio3'] ?? null);
+        $cta = sanitize_input($_POST['cta'] ?? null);
+        $imagem_placeholder = sanitize_input($_POST['imagem_placeholder'] ?? null);
+        $problema_beneficio1 = sanitize_input($_POST['problema_beneficio1'] ?? null);
+        $problema_beneficio2 = sanitize_input($_POST['problema_beneficio2'] ?? null);
+        $problema_beneficio3 = sanitize_input($_POST['problema_beneficio3'] ?? null);
+        $porque_clicar = sanitize_input($_POST['porque_clicar'] ?? null);
+        $pergunta1 = sanitize_input($_POST['pergunta1'] ?? null);
+        $resposta1 = sanitize_input($_POST['resposta1'] ?? null);
+        $pergunta2 = sanitize_input($_POST['pergunta2'] ?? null);
+        $resposta2 = sanitize_input($_POST['resposta2'] ?? null);
+        $pergunta3 = sanitize_input($_POST['pergunta3'] ?? null);
+        $resposta3 = sanitize_input($_POST['resposta3'] ?? null);
+        $pergunta4 = sanitize_input($_POST['pergunta4'] ?? null);
+        $resposta4 = sanitize_input($_POST['resposta4'] ?? null);
+        $pergunta5 = sanitize_input($_POST['pergunta5'] ?? null);
+        $resposta5 = sanitize_input($_POST['resposta5'] ?? null);
+
+        $arquivo_zip_updated = false;
+        $arquivo_zip_path = null;
+
+        if (isset($_FILES['arquivo_zip']) && $_FILES['arquivo_zip']['error'] === UPLOAD_ERR_OK) {
+            $fileName = $_FILES['arquivo_zip']['name'];
+            $fileTmpPath = $_FILES['arquivo_zip']['tmp_name'];
+
+            $fileNameCmps = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameCmps));
+
+            if ($fileExtension === 'zip') {
+                $uploadFileDir = '../../uploads/produtos_zips/';
+
+                if (!is_dir($uploadFileDir)) {
+                    if (!mkdir($uploadFileDir, 0777, true)) {
+                        throw new Exception("Falha ao criar diretório de upload.");
+                    }
+                }
+
+                $newFileName = md5(time() . $fileName) . '.' . $fileExtension;
+                $dest_path = $uploadFileDir . $newFileName;
+
+                if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                    $arquivo_zip_path = 'uploads/produtos_zips/' . $newFileName;
+                    $arquivo_zip_updated = true;
+                } else {
+                    throw new Exception("Erro ao mover o arquivo para o destino final.");
+                }
+            } else {
+                http_response_code(400);
+                echo json_encode(["success" => 0, "message" => "Apenas arquivos .zip são permitidos."]);
+                exit;
+            }
+        }
 
         $update_query = "UPDATE ProdutoDivulgacao SET 
                             titulo_breve = :titulo_breve, 
@@ -99,8 +137,13 @@ try {
                             pergunta4 = :pergunta4,
                             resposta4 = :resposta4,
                             pergunta5 = :pergunta5,
-                            resposta5 = :resposta5
-                        WHERE id = :id";
+                            resposta5 = :resposta5";
+
+        if ($arquivo_zip_updated) {
+            $update_query .= ", arquivo_zip = :arquivo_zip";
+        }
+
+        $update_query .= " WHERE id = :id";
 
         $update_stmt = $connection->prepare($update_query);
 
@@ -128,6 +171,10 @@ try {
         $update_stmt->bindValue(':resposta5', $resposta5, PDO::PARAM_STR);
         $update_stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
+        if ($arquivo_zip_updated) {
+            $update_stmt->bindValue(':arquivo_zip', $arquivo_zip_path, PDO::PARAM_STR);
+        }
+
         if ($update_stmt->execute()) {
             http_response_code(200);
             echo json_encode([
@@ -151,5 +198,11 @@ try {
     echo json_encode([
         'success' => 0,
         'message' => 'Erro no servidor: ' . $e->getMessage()
+    ]);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => 0,
+        'message' => 'Erro: ' . $e->getMessage()
     ]);
 }

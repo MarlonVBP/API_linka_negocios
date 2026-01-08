@@ -29,7 +29,7 @@ if ($id === null) {
 }
 
 try {
-    $query = "DELETE FROM categorias WHERE id = :id";
+    $query = "DELETE FROM tags WHERE id = :id";
     $stmt = $connection->prepare($query);
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
@@ -37,12 +37,12 @@ try {
         http_response_code(200);
         echo json_encode([
             'success' => 1,
-            'message' => 'Categoria excluída com sucesso'
+            'message' => 'Tag excluída com sucesso'
         ]);
     } else {
         echo json_encode([
             'success' => 0,
-            'message' => 'Falha ao excluir categoria'
+            'message' => 'Falha ao excluir tag'
         ]);
     }
 } catch (PDOException $e) {

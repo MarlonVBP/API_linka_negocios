@@ -8,68 +8,45 @@ if ($method === 'OPTIONS') {
     exit;
 }
 
-if ($method !== 'PUT') {
+if ($method !== 'POST') {
     http_response_code(405);
     echo json_encode([
         'success' => 0,
-        'message' => 'Metodo nao permitido. Apenas PUT e aceito.',
+        'message' => 'Metodo nao permitido. Apenas POST e permitido.',
     ]);
     exit;
 }
 
 $data = json_decode(file_get_contents("php://input"));
 $id = isset($data->id) ? intval($data->id) : null;
+$nome = isset($data->nome) ? htmlspecialchars(trim($data->nome)) : null;
+$descricao = isset($data->descricao) ? htmlspecialchars(trim($data->descricao)) : '';
 
-if ($id === null) {
+if ($id === null || empty($nome)) {
     echo json_encode([
         'success' => 0,
-        'message' => 'ID do registro não fornecido.'
+        'message' => 'ID e Nome são obrigatórios.'
     ]);
     exit;
 }
 
 try {
-    
-    $select_query = "SELECT * FROM `exemplo` WHERE id_exemplo = :id_exemplo";
-    $select_stmt = $connection->prepare($select_query);
-    $select_stmt->bindValue(':id_exemplo', $id, PDO::PARAM_INT);
-    $select_stmt->execute();
+    $query = "UPDATE categorias SET nome = :nome, descricao = :descricao WHERE id = :id";
+    $stmt = $connection->prepare($query);
+    $stmt->bindValue(':nome', $nome, PDO::PARAM_STR);
+    $stmt->bindValue(':descricao', $descricao, PDO::PARAM_STR);
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
 
-    if ($select_stmt->rowCount() > 0) {
-        $dado_de_exemplo1 = htmlspecialchars(trim($data->dado1));
-        $dado_de_exemplo2 = htmlspecialchars(trim($data->dado2));
-        $dado_de_exemplo3 = htmlspecialchars(trim($data->dado3));
-        
-        $update_query = "UPDATE `exemplo` SET 
-                            dado_de_exemplo1 = :dado_de_exemplo1, 
-                            dado_de_exemplo2 = :dado_de_exemplo2, 
-                            dado_de_exemplo3 = :dado_de_exemplo3 
-                        WHERE id_exemplo = :id_exemplo";
-
-        $update_stmt = $connection->prepare($update_query);
-
-        $update_stmt->bindValue(':dado_de_exemplo1', $dado_de_exemplo1, PDO::PARAM_STR);
-        $update_stmt->bindValue(':dado_de_exemplo2', $dado_de_exemplo2, PDO::PARAM_STR);
-        $update_stmt->bindValue(':dado_de_exemplo3', $dado_de_exemplo3, PDO::PARAM_STR);
-        
-        $update_stmt->bindValue(':id_exemplo', $id, PDO::PARAM_INT);
-
-        if ($update_stmt->execute()) {
-            http_response_code(200); 
-            echo json_encode([
-                'success' => 1,
-                'message' => 'Dados atualizados com sucesso.'
-            ]);
-        } else {
-            echo json_encode([
-                'success' => 0,
-                'message' => 'Falha na atualização dos dados.'
-            ]);
-        }
+    if ($stmt->execute()) {
+        http_response_code(200);
+        echo json_encode([
+            'success' => 1,
+            'message' => 'Categoria atualizada com sucesso'
+        ]);
     } else {
         echo json_encode([
             'success' => 0,
-            'message' => 'Registro não encontrado para o ID fornecido.'
+            'message' => 'Falha ao atualizar categoria'
         ]);
     }
 } catch (PDOException $e) {
@@ -79,4 +56,3 @@ try {
         'message' => 'Erro no servidor: ' . $e->getMessage()
     ]);
 }
-?>

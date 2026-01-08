@@ -15,16 +15,49 @@ function enviarEmailBoasVindas($emailDestino, $tipo = 'novo')
     $corFundo = "#f4f4f4";
     $anoAtual = date('Y');
 
-
-
     $linkUnsub = "https://linkanegocios.com.br/api/public/newsletter/unsubscribe.php?e=" . base64_encode($emailDestino);
+    $urlImagem = "https://linkanegocios.com.br/api/uploads/banner_newsletter/boas_vindas.jpeg";
+
+    $imagemHtml = "
+        <div style='text-align: center; margin-bottom: 20px;'>
+            <img src='$urlImagem' alt='Bem-vindo à Linka Negócios' style='max-width: 100%; height: auto; border-radius: 8px 8px 0 0;'>
+        </div>
+    ";
+
+    // Variável para armazenar o estilo padrão de parágrafos
+    $pStyle = "margin-bottom: 15px; color: #333333;";
+    // Estilo para a marca LINKA NEGÓCIOS (Negrito e Vermelho conforme PDF Item 7)
+    $brandStyle = "font-weight: bold; color: $corPrimaria;";
 
     if ($tipo == 'novo') {
-        $titulo = "Bem-vindo(a) à Newsletter da Linka Negócios!";
-        $texto  = "Obrigado por se inscrever. Agora você faz parte da nossa lista exclusiva e receberá <strong>gratuitamente</strong> nossos melhores conteúdos mensais sobre gestão e mercado.";
+        // Título atualizado conforme PDF Página 8
+        $titulo = "Bem-vindo(a) à LINKA NEGÓCIOS";
+
+        // Texto completo atualizado conforme PDF Página 8
+        $texto  = "
+            <p style='$pStyle'>Olá,</p>
+            
+            <p style='$pStyle'>Seja bem-vindo(a) à <span style='$brandStyle'>LINKA NEGÓCIOS</span>.</p>
+            
+            <p style='$pStyle'>É um prazer ter você por aqui. Ao se cadastrar em nossa newsletter, você passa a receber conteúdos práticos e estratégicos sobre gestão de pessoas, recrutamento & seleção, liderança, processos e desenvolvimento organizacional, sempre com foco em decisões mais conscientes e resultados sustentáveis para empresas.</p>
+            
+            <p style='$pStyle'>Nossa proposta é simples:</p>
+            
+            <p style='$pStyle'>compartilhar conhecimento aplicado, provocar reflexões relevantes e apoiar empresários e profissionais na construção de equipes mais estruturadas, produtivas e alinhadas aos objetivos do negócio sem improviso.</p>
+            
+            <p style='$pStyle'>Fique à vontade para acompanhar nossos conteúdos e sempre que fizer sentido, conversar conosco.</p>
+            
+            <p style='$pStyle'>Conte com a <span style='$brandStyle'>LINKA NEGÓCIOS</span>.</p>
+            
+            <div style='margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;'>
+                <p style='$pStyle'>Atenciosamente,</p>
+                <p style='margin-bottom: 5px; color: #333;'>Equipe <span style='$brandStyle'>LINKA NEGÓCIOS</span></p>
+                <p style='margin: 0; font-size: 0.9em; color: #666;'>Estratégia, organização e resultados.</p>
+            </div>
+        ";
     } else {
         $titulo = "Bem-vindo(a) de volta!";
-        $texto  = "Ficamos felizes em ter você de volta! Sua <strong>inscrição na newsletter</strong> foi reativada e você voltará a receber nossos conteúdos.";
+        $texto  = "<p style='$pStyle'>Ficamos felizes em ter você de volta! Sua <strong>inscrição na newsletter</strong> foi reativada e você voltará a receber nossos conteúdos.</p>";
     }
 
     $html = "
@@ -36,16 +69,18 @@ function enviarEmailBoasVindas($emailDestino, $tipo = 'novo')
                 <table width='600' style='background-color: #ffffff; border-radius: 8px; overflow: hidden; max-width: 100%;'>
                     <tr>
                         <td align='center' style='background-color: $corPrimaria; padding: 30px;'>
-                            <h1 style='color: #ffffff; margin: 0; font-size: 24px;'>Linka Negócios</h1>
+                            <h1 style='color: #ffffff; margin: 0; font-size: 24px; font-weight: bold; text-transform: uppercase;'>LINKA NEGÓCIOS</h1>
                         </td>
                     </tr>
                     <tr>
                         <td style='padding: 40px; color: #333333; line-height: 1.6;'>
-                            <h2 style='color: #212121; margin-top: 0;'>$titulo</h2>
-                            <p>$texto</p>
-                            <p>Fique de olho na sua caixa de entrada!</p>
+                        $imagemHtml
+                            <h2 style='color: #212121; margin-top: 0; margin-bottom: 25px;'>$titulo</h2>
+                            
+                            $texto
+                            
                             <br>
-                            <table width='100%' border='0' cellspacing='0' cellpadding='0'>
+                            <table width='100%' border='0' cellspacing='0' cellpadding='0' style='margin-top: 20px;'>
                                 <tr>
                                     <td align='center'>
                                         <a href='https://www.linkanegocios.com.br' style='background-color: $corPrimaria; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;'>Acessar o Site</a>
@@ -57,7 +92,7 @@ function enviarEmailBoasVindas($emailDestino, $tipo = 'novo')
                     <tr>
                         <td align='center' style='background-color: #f8f9fa; padding: 20px; color: #666; font-size: 12px; border-top: 1px solid #eee;'>
                             <p style='margin: 0 0 10px 0;'>
-                                Você recebeu este e-mail porque se inscreveu na newsletter da Linka Negócios.
+                                Você recebeu este e-mail porque se inscreveu na newsletter da <strong style='color: $corPrimaria'>LINKA NEGÓCIOS</strong>.
                             </p>
                             <p style='margin: 0;'>
                                 Não deseja mais receber? 
